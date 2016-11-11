@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<meta charset="utf-8" http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<style> /* set the CSS */
+
+path { 
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: none;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+</style>
+
+<head>
+    <!--Import Google Icon Font-->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+
+<body class="blue-grey darken-4">
+
+<!-- load the d3.js library -->    
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<!--Import jQuery before materialize.js-->
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="js/materialize.min.js"></script>
+<nav>
+    <div class="nav-wrapper z-depth-3 blue">
+        <a href="#" class="brand-logo"><i class="material-icons">equalizer</i>Energy monitoring</a>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+        <div class="row">
+            <div class="col s12">
+                <div class="card z-depth-3 blue-grey darken-2">
+                    <div class="card-content white-text">
+                        <span class="card-title">Test graph</span>
+                            <div id="graph1"> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+// Set the dimensions of the canvas / graph
+var margin = {top: 30, right: 10, bottom: 30, left: 50},
+    width = parseInt(d3.select('#graph1').style('width'), 10),
+    width = width - margin.left - margin.right,
+    barHeight = 20,
+    height = 270 - margin.top - margin.bottom,
+    percent = d3.format('%');
+// Parse the date / time
+var parseDate = d3.time.format("%d-%b-%y").parse;
+// Set the ranges
+var x = d3.time.scale().range([0, width]);
+var y = d3.scale.linear().range([height, 0]);
+// Define the axes
+var xAxis = d3.svg.axis().scale(x)
+    .orient("bottom").ticks(5);
+var yAxis = d3.svg.axis().scale(y)
+    .orient("left").ticks(5);
+// Define the line
+var valueline = d3.svg.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.close); });
+// Adds the svg canvas
+var svg = d3.select("#graph1")
+    .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform",
+              "translate(" + margin.left + "," + margin.top + ")");
+// Get the data
+d3.csv("data.csv", function(error, data) {
+    data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.close = +d.close;
+    });
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([0, d3.max(data, function(d) { return d.close; })]);
+    // Add the valueline path.
+    var path = svg.append("path")
+        .attr("class", "line")
+        .attr("d", valueline(data));
+    var totalLength = path.node().getTotalLength();
+    path
+        .attr("stroke-dasharray", totalLength + " " + totalLength)
+        .attr("stroke-dashoffset", totalLength)
+        .transition()
+        .duration(1000)
+        .ease("linear")
+        .attr("stroke-dashoffset", 0);
+    // Add the X Axis
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+    // Add the Y Axis
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+});
+var path = svg.select('path')
+</script>
+
+</body>
