@@ -31,8 +31,18 @@
             <div class="col s12">
                 <div class="card z-depth-3 blue-grey darken-2">
                     <div class="card-content white-text">
-                        <span class="card-title">Test graph</span>
+                        <span class="card-title">Graph 1</span>
                             <div id="graph1"> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12">
+                <div class="card z-depth-3 blue-grey darken-2">
+                    <div class="card-content white-text">
+                        <span class="card-title">Graph 2</span>
+                            <div id="graph2"> </div>
                     </div>
                 </div>
             </div>
@@ -62,46 +72,56 @@ var yAxis = d3.svg.axis().scale(y)
 var valueline = d3.svg.line()
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.value); });
-// Adds the svg canvas
-var svg = d3.select("#graph1")
-    .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-        .attr("transform",
-              "translate(" + margin.left + "," + margin.top + ")");
-// Get the data
-d3.json("dbCon.php", function(error, data) {
-    data.forEach(function(d) {
-        d.date = parseDate(d.ts);
-        d.value = +d.value;
+// Function to add a linear graph
+function addGraph(position, php){
+    // Adds the svg canvas
+    var svg = d3.select(position)
+        .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+            .attr("transform",
+                  "translate(" + margin.left + "," + margin.top + ")");
+    // Get the data
+    d3.json(php, function(error, data) {
+        data.forEach(function(d) {
+            d.date = parseDate(d.ts);
+            d.value = +d.value;
+        });
+        // Scale the range of the data
+        x.domain(d3.extent(data, function(d) { return d.date; }));
+        y.domain([0, d3.max(data, function(d) { return d.value; })]);
+        // Add the valueline path.
+        var path = svg.append("path")
+            .attr("class", "line")
+            .attr("d", valueline(data));
+        var totalLength = path.node().getTotalLength();
+        path
+            .attr("stroke-dasharray", totalLength + " " + totalLength)
+            .attr("stroke-dashoffset", totalLength)
+            .transition()
+            .duration(1000)
+            .ease("linear")
+            .attr("stroke-dashoffset", 0);
+        // Add the X Axis
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+        // Add the Y Axis
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+        // Add title
+        svg.append("text")
+            .attr("text-anchor", "middle")
+            .attr("transform", "translate("+ (-3*margin.left/4) +","+(height/2)+")rotate(-90)")
+            .text("Conso");
     });
-    // Scale the range of the data
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0, d3.max(data, function(d) { return d.value; })]);
-    // Add the valueline path.
-    var path = svg.append("path")
-        .attr("class", "line")
-        .attr("d", valueline(data));
-    var totalLength = path.node().getTotalLength();
-    path
-        .attr("stroke-dasharray", totalLength + " " + totalLength)
-        .attr("stroke-dashoffset", totalLength)
-        .transition()
-        .duration(1000)
-        .ease("linear")
-        .attr("stroke-dashoffset", 0);
-    // Add the X Axis
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
-    // Add the Y Axis
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
-});
-var path = svg.select('path')
+}
+
+addGraph("#graph1", "dbCon.php");
+addGraph("#graph2", "dbCon.php");
 </script>
 
 </body>

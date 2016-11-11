@@ -11,3 +11,10 @@ path {
     stroke-width: 1;
     shape-rendering: crispEdges;
 }
+.axis text {
+    fill: lightgrey;
+}
+
+svg text{
+    fill: lightgrey;
+}
