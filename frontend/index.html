@@ -19,6 +19,7 @@
 <!--Import jQuery before materialize.js-->
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="js/materialize.min.js"></script>
+
 <nav>
     <div class="nav-wrapper z-depth-3 blue">
         <a href="#" class="brand-logo"><i class="material-icons">equalizer</i>Energy monitoring</a>
@@ -27,6 +28,24 @@
 
 <main>
     <div class="container">
+        <div class="row">
+            <div class="col s12 m6">
+                <div class="card z-depth-3 blue-grey darken-2">
+                    <div class="card-content white-text">
+                        <span class="card-title">Info 1</span>
+                            <p>test</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col s12 m6">
+                <div class="card z-depth-3 blue-grey darken-2">
+                    <div class="card-content white-text">
+                        <span class="card-title">Info 2</span>
+                            <p>test</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col s12">
                 <div class="card z-depth-3 blue-grey darken-2">
@@ -65,11 +84,23 @@ var x = d3.time.scale().range([0, width]);
 var y = d3.scale.linear().range([height, 0]);
 // Define the axes
 var xAxis = d3.svg.axis().scale(x)
-    .orient("bottom").ticks(5);
+    .orient("bottom")
+    .innerTickSize(-height)
+    .outerTickSize(0)
+    .tickPadding(10);
 var yAxis = d3.svg.axis().scale(y)
-    .orient("left").ticks(5);
+    .orient("left")
+    .innerTickSize(-width)
+    .outerTickSize(0)
+    .tickPadding(10);
+var area = d3.svg.area()
+    .interpolate("cardinal")
+    .x(function(d) { return x(d.date); })
+    .y0(height)
+    .y1(function(d) { return y(d.value); });
 // Define the line
 var valueline = d3.svg.line()
+    .interpolate("cardinal")
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.value); });
 // Function to add a linear graph
@@ -91,6 +122,10 @@ function addGraph(position, php){
         // Scale the range of the data
         x.domain(d3.extent(data, function(d) { return d.date; }));
         y.domain([0, d3.max(data, function(d) { return d.value; })]);
+        svg.append("path")
+            .datum(data)
+            .attr("class", "area")
+            .attr("d", area);
         // Add the valueline path.
         var path = svg.append("path")
             .attr("class", "line")
@@ -112,11 +147,6 @@ function addGraph(position, php){
         svg.append("g")
             .attr("class", "y axis")
             .call(yAxis);
-        // Add title
-        svg.append("text")
-            .attr("text-anchor", "middle")
-            .attr("transform", "translate("+ (-3*margin.left/4) +","+(height/2)+")rotate(-90)")
-            .text("Conso");
     });
 }
 

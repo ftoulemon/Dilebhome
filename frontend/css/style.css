@@ -1,7 +1,7 @@
 path { 
     stroke: steelblue;
     stroke-width: 2;
-    fill: none;
+    fill: None;
 }
 
 .axis path,
@@ -14,7 +14,16 @@ path {
 .axis text {
     fill: lightgrey;
 }
+.tick line{
+    opacity: 0.3;
+}
 
 svg text{
     fill: lightgrey;
+}
+
+.area {
+    fill: #546e7a;
+    stroke-width: 0;
+    opacity: 0.8;
 }
