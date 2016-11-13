@@ -27,3 +27,12 @@ svg text{
     stroke-width: 0;
     opacity: 0.8;
 }
+
+.overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+.focus circle {
+    fill: steelblue;
+}

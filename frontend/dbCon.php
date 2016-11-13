@@ -7,21 +7,32 @@
     $server = mysql_connect($host, $username, $password);
     $connection = mysql_select_db($database, $server);
 
-    $myquery = "SELECT  `ts`, `value` FROM `records`";
-    $query = mysql_query($myquery);
-
-    if ( ! $query ) {
-        echo mysql_error();
-        die;
+    if ($_GET['data'] == 'info') {
+        $myquery = "SELECT * FROM info";
+        $query = mysql_query($myquery);
+        if ( ! $query ) {
+            echo mysql_error();
+            die;
+        }
+        echo json_encode(mysql_fetch_assoc($query));
     }
+    else {
+        $myquery = "SELECT  `ts`, `value` FROM `records`";
+        $query = mysql_query($myquery);
 
-    $data = array();
+        if ( ! $query ) {
+            echo mysql_error();
+            die;
+        }
 
-    for ($x = 0; $x < mysql_num_rows($query); $x++) {
-        $data[] = mysql_fetch_assoc($query);
+        $data = array();
+
+        for ($x = 0; $x < mysql_num_rows($query); $x++) {
+            $data[] = mysql_fetch_assoc($query);
+        }
+
+        echo json_encode($data);
     }
-
-    echo json_encode($data);
 
     mysql_close($server);
 ?>

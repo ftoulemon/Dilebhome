@@ -7,7 +7,9 @@ var margin = {top: 30, right: 10, bottom: 30, left: 50},
     percent = d3.format('%');
 
 // Parse the date / time
-var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse,
+    bisectDate = d3.bisector(function(d) { return d.date; }).left,
+    formatValue = function(d) { return d + "kW"; };
 
 // Set the ranges
 var x = d3.time.scale().range([0, width]);
@@ -82,6 +84,31 @@ function addGraph(position, php){
         svg.append("g")
             .attr("class", "y axis")
             .call(yAxis);
+        // Manage focus
+        var focus = svg.append("g")
+            .attr("class", "focus")
+            .style("display", "none");
+        focus.append("circle")
+            .attr("r", 4.5);
+        focus.append("text")
+            .attr("x", 9)
+            .attr("dy", ".35em");
+        svg.append("rect")
+            .attr("class", "overlay")
+            .attr("width", width)
+            .attr("height", height)
+            .on("mouseover", function() { focus.style("display", null); })
+            .on("mouseout", function() { focus.style("display", "none"); })
+            .on("mousemove", mousemove);
+        function mousemove() {
+            var x0 = x.invert(d3.mouse(this)[0]),
+                i = bisectDate(data, x0, 1),
+                d0 = data[i - 1],
+                d1 = data[i],
+                d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            focus.attr("transform", "translate(" + x(d.date) + "," + y(d.value) + ")");
+            focus.select("text").text(formatValue(d.value));
+        }
     });
 }
 

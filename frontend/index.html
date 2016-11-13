@@ -2,6 +2,7 @@
 <meta charset="utf-8" http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
 <head>
+    <title>Monitoring</title>
     <!--Import Google Icon Font-->
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
@@ -20,6 +21,8 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="js/materialize.min.js"></script>
 
+<script type="text/javascript" src="info.js"></script>
+
 <nav>
     <div class="nav-wrapper z-depth-3 blue">
         <a href="#" class="brand-logo"><i class="material-icons">equalizer</i>Energy monitoring</a>
@@ -32,8 +35,14 @@
             <div class="col s12 m6">
                 <div class="card z-depth-3 blue-grey darken-2">
                     <div class="card-content white-text">
-                        <span class="card-title">Info 1</span>
-                            <p>test</p>
+                        <span class="card-title">Info</span>
+                        <table class="bordered">
+                            <tbody>
+                                <tr><td>ID</td> <td id="adco"></td></tr>
+                                <tr><td>Option tarif</td> <td id="optarif"></td></tr>
+                                <tr><td>Intensité souscrite</td> <td id="isousc"></td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -69,6 +78,9 @@
     </div>
 </main>
 
+<script type="text/javascript">
+    populateInfo();
+</script>
 <script src="graph.js"></script>
 
 </body>
