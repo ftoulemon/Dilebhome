@@ -18,7 +18,7 @@ function httpGetAsync(theUrl, callback)
 
 function printCompteurInfo(text) {
     data = JSON.parse(text);
-    document.getElementById("adco").innerHTML = data.acdo;
+    document.getElementById("adco").innerHTML = data.adco;
     document.getElementById("optarif").innerHTML = data.optarif;
     document.getElementById("isousc").innerHTML = data.isousc;
 }
