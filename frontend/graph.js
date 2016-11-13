@@ -1,9 +1,9 @@
 // Set the dimensions of the canvas / graph
-var margin = {top: 30, right: 10, bottom: 30, left: 50},
+var margin = {top: 30, right: 10, bottom: 140, left: 50},
     width = parseInt(d3.select('#graph1').style('width'), 10),
     width = width - margin.left - margin.right,
     barHeight = 20,
-    height = 270 - margin.top - margin.bottom,
+    height = 400 - margin.top - margin.bottom,
     percent = d3.format('%');
 
 // Parse the date / time
@@ -20,7 +20,8 @@ var xAxis = d3.svg.axis().scale(x)
     .orient("bottom")
     .innerTickSize(-height)
     .outerTickSize(0)
-    .tickPadding(10);
+    .tickPadding(10)
+    .tickFormat(d3.time.format("%d-%m-%Y %H:%M:%S"));
 var yAxis = d3.svg.axis().scale(y)
     .orient("left")
     .innerTickSize(-width)
@@ -79,7 +80,14 @@ function addGraph(position, php){
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
+            .call(xAxis)
+            .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", function(d) {
+                    return "rotate(-65)"
+                    });
         // Add the Y Axis
         svg.append("g")
             .attr("class", "y axis")
