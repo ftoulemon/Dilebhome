@@ -52,3 +52,7 @@ svg text{
 .switch label input[type=checkbox]:disabled:not(checked)+.lever:after {
     background-color: white;
 }
+
+.gauge-board {
+    text-align: center;
+}
