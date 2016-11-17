@@ -7,8 +7,8 @@
     $server = mysql_connect($host, $username, $password);
     $connection = mysql_select_db($database, $server);
 
-    if ($_GET['data'] == 'info') {
-        $myquery = "SELECT * FROM info";
+    if (($_GET['data'] == 'info') || ($_GET['data'] == 'system')) {
+        $myquery = "SELECT * FROM " . $_GET['data'];
         $query = mysql_query($myquery);
         if ( ! $query ) {
             echo mysql_error();

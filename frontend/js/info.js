@@ -23,6 +23,12 @@ function printCompteurInfo(text) {
     document.getElementById("isousc").innerHTML = data.isousc;
 }
 
+function printSystemInfo(text) {
+    data = JSON.parse(text);
+    document.getElementById("du").value = data.du;
+}
+
 function populateInfo() {
     httpGetAsync("dbCon.php?data=info", printCompteurInfo);
+    httpGetAsync("dbCon.php?data=system", printSystemInfo);
 }
