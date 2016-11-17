@@ -259,8 +259,8 @@ var svg;
 
      //Render Gauge Color Area
      var translate = "translate(" + width / 2 + "," + width / 2 + ")";
-     var cScale = d3.scale.linear().domain([minLimit, maxLimit]).range([-120 * (Math.PI / 180), 120 * (Math.PI / 180)]);
-     var arc = d3.svg.arc()
+     var cScale = d3.scaleLinear().domain([minLimit, maxLimit]).range([-120 * (Math.PI / 180), 120 * (Math.PI / 180)]);
+     var arc = d3.arc()
          .innerRadius(innerRadius)
          .outerRadius(outterRadius)
          .startAngle(function (d) { return cScale(d[0]); })

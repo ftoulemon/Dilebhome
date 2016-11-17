@@ -7,42 +7,37 @@ var margin = {top: 30, right: 10, bottom: 140, left: 50},
     percent = d3.format('%');
 
 // Parse the date / time
-var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse,
+var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S"),
     bisectDate = d3.bisector(function(d) { return d.date; }).left,
     formatValue = function(d) { return d + "kW"; };
 
-// Set the ranges
-var x = d3.time.scale().range([0, width]);
-var y = d3.scale.linear().range([height, 0]);
-
-// Define the axes
-var xAxis = d3.svg.axis().scale(x)
-    .orient("bottom")
-    .innerTickSize(-height)
-    .outerTickSize(0)
-    .tickPadding(10)
-    .tickFormat(d3.time.format("%d-%m-%Y %H:%M:%S"));
-var yAxis = d3.svg.axis().scale(y)
-    .orient("left")
-    .innerTickSize(-width)
-    .outerTickSize(0)
-    .tickPadding(10);
-
-// Area under the line
-var area = d3.svg.area()
-    .interpolate("cardinal")
-    .x(function(d) { return x(d.date); })
-    .y0(height)
-    .y1(function(d) { return y(d.value); });
-
-// Define the line
-var valueline = d3.svg.line()
-    .interpolate("cardinal")
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.value); });
-
 // Function to add a linear graph
 function addGraph(position, php){
+    // Set the ranges
+    var x = d3.scaleTime().range([0, width]);
+    var y = d3.scaleLinear().range([height, 0]);
+    // Define the axes
+    var xAxis = d3.axisBottom(x)
+        .tickSizeInner(-height)
+        .tickSizeOuter(0)
+        .tickPadding(10)
+        .tickFormat(d3.timeFormat("%d-%m-%Y %H:%M:%S"));
+    var yAxis = d3.axisLeft(y)
+        .tickSizeInner(-width)
+        .tickSizeOuter(0)
+        .tickPadding(10);
+    // Area under the line
+    var area = d3.area()
+        .curve(d3.curveCardinal)
+        .x(function(d) { return x(d.date); })
+        .y0(height)
+        .y1(function(d) { return y(d.value); });
+    // Define the line
+    var valueline = d3.line()
+        .curve(d3.curveCardinal)
+        .x(function(d) { return x(d.date); })
+        .y(function(d) { return y(d.value); });
+
     // Adds the svg canvas
     var svg = d3.select(position)
         .append("svg")
@@ -61,7 +56,7 @@ function addGraph(position, php){
         x.domain(d3.extent(data, function(d) { return d.date; }));
         y.domain([0, d3.max(data, function(d) { return d.value; })]);
         svg.append("path")
-            .datum(data)
+            .data([data])
             .attr("class", "area")
             .attr("d", area);
         // Add the valueline path.
@@ -74,7 +69,7 @@ function addGraph(position, php){
             .attr("stroke-dashoffset", totalLength)
             .transition()
             .duration(1000)
-            .ease("linear")
+            .ease(d3.easeLinear)
             .attr("stroke-dashoffset", 0);
         // Add the X Axis
         svg.append("g")
@@ -120,5 +115,98 @@ function addGraph(position, php){
     });
 }
 
+
+// Function to add a bar graph
+function addBarGraph(position, php){
+    // axis
+    var x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
+    var y = d3.scaleLinear().rangeRound([height, 0]);
+    var z = d3.scaleOrdinal().range(["#81d4fa", "#4fc3f7"]);
+    var stack = d3.stack();
+    // Define the axes
+    var xAxis = d3.axisBottom(x)
+        .tickSizeInner(0)
+        .tickSizeOuter(0)
+        .tickPadding(10)
+        .tickFormat(d3.timeFormat("%d-%m-%Y %H:%M:%S"));
+    var yAxis = d3.axisLeft(y)
+        .tickSizeInner(-width)
+        .tickSizeOuter(0)
+        .tickPadding(10);
+    // Adds the svg canvas
+    var svg = d3.select(position)
+        .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+            .attr("transform",
+                  "translate(" + margin.left + "," + margin.top + ")");
+    // Get the data
+    d3.json(php, function(error, data) {
+        data.forEach(function(d) {
+            d.date = parseDate(d.ts);
+            d.hc = +d.value;
+            d.hp = +d.value;
+        });
+        data.sort(function(a, b) { return b.total - a.total; });
+        data.columns = ["date", "hc", "hp"];
+        // Scale the range of the data
+        x.domain(data.map(function(d) { return d.date; }));
+        y.domain([0, d3.max(data, function(d) { return d.hp + d.hc; })]);
+        z.domain(data.columns.slice(1));
+        var serie = svg.selectAll(".serie")
+            .data(stack.keys(data.columns.slice(1))(data))
+            .enter().append("g")
+               .attr("class", "serie")
+               .attr("fill", function(d) { return z(d.key); });
+        serie.selectAll("rect")
+           .data(function(d) { return d; })
+           .enter().append("rect")
+               .attr("x", function(d) { return x(d.data.date); })
+               .attr("y", function(d) { return y(d[1]); })
+               .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+               .attr("width", x.bandwidth());
+        svg.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+           .call(xAxis)
+            .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", function(d) {
+                    return "rotate(-65)"
+                    });
+        svg.append("g")
+           .attr("class", "axis axis--y")
+           .call(yAxis)
+         .append("text")
+           .attr("x", 2)
+           .attr("y", y(y.ticks(10).pop()))
+           .attr("dy", "0.35em")
+           .attr("text-anchor", "start")
+           .attr("fill", "#000")
+           .text("kWh");
+        var legend = svg.selectAll(".legend")
+         .data(data.columns.slice(1).reverse())
+         .enter().append("g")
+           .attr("class", "legend")
+           .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
+           .style("font", "10px sans-serif");
+        width = parseInt(d3.select(position).style("width"));
+        legend.append("rect")
+           .attr("x", width - 88)
+           .attr("width", 18)
+           .attr("height", 18)
+           .attr("fill", z);
+        legend.append("text")
+           .attr("x", width - 94)
+           .attr("y", 9)
+           .attr("dy", ".35em")
+           .attr("text-anchor", "end")
+           .text(function(d) { return d; });
+    });
+}
+
 addGraph("#graph1", "dbCon.php");
-addGraph("#graph2", "dbCon.php");
+addBarGraph("#graph2", "dbCon.php");
