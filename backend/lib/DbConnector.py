@@ -8,6 +8,7 @@ class DbConnector(object):
     """
     RECORDS_TABLE = 'records'
     INFO_TABLE = 'info'
+    SYSTEM_TABLE = 'system'
 
     def __enter__(self):
         """
@@ -24,7 +25,7 @@ class DbConnector(object):
             return
         # Get cursor
         self._Cursor = self._DB.cursor()
-        # Init tables
+        # Record table
         try:
             self._Cursor.execute("CREATE TABLE IF NOT EXISTS {0} "
                     "(value INT, "
@@ -32,7 +33,7 @@ class DbConnector(object):
                     .format(self.RECORDS_TABLE))
         except Exception as e:
             print "Error creating table {0}: {1}".format(self.RECORDS_TABLE, e)
-        # Create table
+        # Info table
         try:
             self._Cursor.execute("CREATE TABLE IF NOT EXISTS {0} "
                     "(adco VARCHAR(15) NOT NULL, "
@@ -41,6 +42,16 @@ class DbConnector(object):
                     .format(self.INFO_TABLE))
         except Exception as e:
             print "Error creating table {0}: {1}".format(self.INFO_TABLE, e)
+        # System table
+        try:
+            self._Cursor.execute("CREATE TABLE IF NOT EXISTS {0} "
+                    "(id INT NOT NULL, "
+                    "du INT NOT NULL, "
+                    "UNIQUE (id))"
+                    .format(self.SYSTEM_TABLE))
+        except Exception as e:
+            print "Error creating table {0}: {1}".format(self.SYSTEM_TABLE, e)
+        return self
 
 
     def __exit__(self, type, value, tb):
@@ -48,28 +59,43 @@ class DbConnector(object):
         Close connection
         """
         if self._DB is not None:
+            self._DB.commit()
             self._DB.close()
 
+    def UpdateSystem(self, aDU):
+        """
+        Update system table
+        """
+        wCommand = ("INSERT INTO {0} "
+               "(id, du) "
+               "VALUES "
+               "(0, {1}) "
+               "ON DUPLICATE KEY UPDATE "
+               "du={1}"
+               .format(self.SYSTEM_TABLE, aDU))
+        self._Cursor.execute(wCommand)
 
     def UpdateInfo(self, aADCO, aOPTARIF, aISOUSC):
         """
         Update the information table
         """
-        self._Cursor.execute("INSERT INTO {0} "
+        wCommand = ("INSERT INTO {0} "
                "(adco, optarif, isousc) "
                "VALUES "
                "('{1}', '{2}', '{3}') "
                "ON DUPLICATE KEY UPDATE "
                "optarif='{2}', isousc='{3}'"
                .format(self.INFO_TABLE, aADCO, aOPTARIF, aISOUSC))
+        self._Cursor.execute(wCommand)
 
     def SaveRecord(self, aRecord):
         """
         Insert a new record in the records table
         """
-        self._Cursor.execute("INSERT INTO {0} (value) "
+        wCommand = ("INSERT INTO {0} (value) "
                             "VALUES "
                             "({1})"
                             .format(self.RECORDS_TABLE, aRecord))
+        self._Cursor.execute(wCommand)
 
 

@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import serial
+import time
 
 from DbConnector import DbConnector
 
@@ -47,9 +48,12 @@ class Acquisition(object):
                 wByte = wPort.read()
                 if wByte == chr(2):
                     self.__ProcessFrame(wFrame)
+                    wFrame = ''
+                    time.sleep(1)
                 else:
                     wFrame += wByte
             except Exception as e:
+                print "Read error:", e
                 self._StopRequested = True
         # close port
         try:
