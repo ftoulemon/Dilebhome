@@ -135,7 +135,7 @@ var svg;
 
      var lastGraduationValue = majorGraduationValues[majorGraduationValues.length - 1];
      var textSize = isNaN(majorGraduationTextSize) ? (width * 12) / 300 : majorGraduationTextSize;
-     var fontStyle = textSize + "px Courier";
+     var fontStyle = textSize + "px";
 
      var dummyText = svg.append("text")
          .attr("x", centerX)
@@ -212,7 +212,7 @@ var svg;
          var rightY = centerY - needleRadius * Math.sin(thetaRad + Math.PI / 2);
          var triangle = "M " + leftX + " " + leftY + " L " + topX + " " + topY + " L " + rightX + " " + rightY;
          var textSize = isNaN(needleValueTextSize) ? (width * 12) / 300 : needleValueTextSize;
-         var fontStyle = textSize + "px Courier";
+         var fontStyle = textSize + "px";
 
          if (scope.value >= minLimit && scope.value <= maxLimit) {
              svg.append("svg:path")
