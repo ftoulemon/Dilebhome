@@ -25,6 +25,22 @@ class DbConnector(object):
             return
         # Get cursor
         self._Cursor = self._DB.cursor()
+        return self
+
+
+    def __exit__(self, type, value, tb):
+        """
+        Close connection
+        """
+        if self._DB is not None:
+            self._DB.commit()
+            self._DB.close()
+
+
+    def Init(self):
+        """
+        Initialize the DB tables
+        """
         # Record table
         try:
             self._Cursor.execute("CREATE TABLE IF NOT EXISTS {0} "
@@ -51,16 +67,7 @@ class DbConnector(object):
                     .format(self.SYSTEM_TABLE))
         except Exception as e:
             print "Error creating table {0}: {1}".format(self.SYSTEM_TABLE, e)
-        return self
 
-
-    def __exit__(self, type, value, tb):
-        """
-        Close connection
-        """
-        if self._DB is not None:
-            self._DB.commit()
-            self._DB.close()
 
     def UpdateSystem(self, aDU):
         """

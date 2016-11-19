@@ -2,6 +2,7 @@
 
 import serial
 import time
+import datetime
 
 from DbConnector import DbConnector
 
@@ -11,14 +12,30 @@ class Acquisition(object):
         Constructor
         """
         self._StopRequested = False
+        self._PreviousTime = datetime.datetime.now()
 
 
     def __ProcessFrame(self, aFrame):
         """
         Save the data in the the database
         """
+        wCurrentTime = datetime.datetime.now()
+        # TODO: test frame integrity
+        # Frame to dictionary
+        wDic = {}
+        for i in aFrame.strip().split('\n'):
+            wWord = i.split()
+            if 3 == len(wWord):
+                wDic[wWord[0]] = wWord[1]
         with DbConnector() as wDb:
-            print aFrame
+            if (wCurrentTime - self._PreviousTime).seconds >= 6:
+                # Every minutes, update the info
+                try:
+                    wDb.UpdateInfo(wDic['ADCO'], wDic['OPTARIF'], wDic['ISOUSC'])
+                except Exception as e:
+                    print "Update info error: ", e
+                    return
+        self._PreviousTime = wCurrentTime
 
 
     def GetData(self):
@@ -46,9 +63,10 @@ class Acquisition(object):
         while not self._StopRequested:
             try:
                 wByte = wPort.read()
-                if wByte == chr(2):
-                    self.__ProcessFrame(wFrame)
+                if wByte == START_OF_FRAME:
                     wFrame = ''
+                elif wByte == END_OF_FRAME:
+                    self.__ProcessFrame(wFrame)
                     time.sleep(1)
                 else:
                     wFrame += wByte
