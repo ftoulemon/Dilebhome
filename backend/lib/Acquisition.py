@@ -28,15 +28,17 @@ class Acquisition(object):
             wWord = i.split()
             if 3 == len(wWord):
                 wDic[wWord[0]] = wWord[1]
+        logging.debug(wDic)
+        # Save data in DB
         with DbConnector() as wDb:
-            if (wCurrentTime - self._PreviousTime).seconds >= 6:
-                # Every minutes, update the info
+            if (wCurrentTime - self._PreviousTime).seconds >= 5:
+                # Every 30, update the info
+                logging.info("Update info")
                 try:
                     wDb.UpdateInfo(wDic['ADCO'], wDic['OPTARIF'], wDic['ISOUSC'])
                 except Exception as e:
                     logging.error("Update info error: {0}".format(e))
-                    return
-        self._PreviousTime = wCurrentTime
+                self._PreviousTime = wCurrentTime
 
 
     def GetData(self):
