@@ -3,6 +3,7 @@
 import serial
 import time
 import datetime
+import logging
 
 from DbConnector import DbConnector
 
@@ -33,7 +34,7 @@ class Acquisition(object):
                 try:
                     wDb.UpdateInfo(wDic['ADCO'], wDic['OPTARIF'], wDic['ISOUSC'])
                 except Exception as e:
-                    print "Update info error: ", e
+                    logging.error("Update info error: {0}".format(e))
                     return
         self._PreviousTime = wCurrentTime
 
@@ -71,13 +72,13 @@ class Acquisition(object):
                 else:
                     wFrame += wByte
             except Exception as e:
-                print "Read error:", e
+                logging.error("Read error: {0}".format(e))
                 self._StopRequested = True
         # close port
         try:
             wPort.close()
         except exception as e:
-            print e
+            logging.error("IO error: {0}".format(e))
 
     def Stop(self):
         self._StopRequested = True

@@ -1,6 +1,8 @@
 # coding: utf-8
 
+import logging
 import MySQLdb
+from warnings import filterwarnings
 
 class DbConnector(object):
     """
@@ -21,7 +23,7 @@ class DbConnector(object):
                                     passwd = "password",
                                     db = "Electricity")
         except Exception as e:
-            print "Can't connect to DB:", e
+            logging.error("Can't connect to DB: {0}".format(e))
             return
         # Get cursor
         self._Cursor = self._DB.cursor()
@@ -41,6 +43,7 @@ class DbConnector(object):
         """
         Initialize the DB tables
         """
+        filterwarnings('ignore', category = MySQLdb.Warning)
         # Record table
         try:
             self._Cursor.execute("CREATE TABLE IF NOT EXISTS {0} "
@@ -48,7 +51,7 @@ class DbConnector(object):
                     "ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)"
                     .format(self.RECORDS_TABLE))
         except Exception as e:
-            print "Error creating table {0}: {1}".format(self.RECORDS_TABLE, e)
+            logging.error("Error creating table {0}: {1}".format(self.RECORDS_TABLE, e))
         # Info table
         try:
             self._Cursor.execute("CREATE TABLE IF NOT EXISTS {0} "
@@ -57,7 +60,7 @@ class DbConnector(object):
                     "UNIQUE (adco))"
                     .format(self.INFO_TABLE))
         except Exception as e:
-            print "Error creating table {0}: {1}".format(self.INFO_TABLE, e)
+            logging.error("Error creating table {0}: {1}".format(self.INFO_TABLE, e))
         # System table
         try:
             self._Cursor.execute("CREATE TABLE IF NOT EXISTS {0} "
@@ -66,7 +69,7 @@ class DbConnector(object):
                     "UNIQUE (id))"
                     .format(self.SYSTEM_TABLE))
         except Exception as e:
-            print "Error creating table {0}: {1}".format(self.SYSTEM_TABLE, e)
+            logging.error("Error creating table {0}: {1}".format(self.SYSTEM_TABLE, e))
 
 
     def UpdateSystem(self, aDU):

@@ -1,6 +1,7 @@
 import os
 import threading
 import time
+import logging
 
 from DbConnector import DbConnector
 
@@ -17,6 +18,7 @@ class SystemMonitor(threading.Thread):
         wTotal = wStat.f_frsize * wStat.f_blocks
         wAvail = wStat.f_frsize * wStat.f_bavail
         wUsedPercent = int(100 * (wTotal - wAvail) / wTotal)
+        logging.info("Disk usage: {0}%".format(wUsedPercent))
         with DbConnector() as wDb:
             wDb.UpdateSystem(wUsedPercent)
 
