@@ -55,7 +55,8 @@ class Acquisition(object):
                     stopbits=serial.STOPBITS_ONE,
                     parity=serial.PARITY_ODD,
                     timeout=10)
-        except:
+        except Exception as e:
+            logging.error("Can't open serial: {0}".format(e))
             return
         wByte = ''
         wFrame = ''
