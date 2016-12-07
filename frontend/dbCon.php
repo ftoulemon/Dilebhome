@@ -17,7 +17,7 @@
         echo json_encode(mysql_fetch_assoc($query));
     }
     else {
-        $myquery = "SELECT  `ts`, `value` FROM `records`";
+        $myquery = "SELECT  `ts`, `iinst`, `hchc`, `hchp` FROM `records`";
         $query = mysql_query($myquery);
 
         if ( ! $query ) {

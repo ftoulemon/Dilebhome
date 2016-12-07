@@ -8,7 +8,7 @@ var margin = {top: 30, right: 10, bottom: 140, left: 50},
 
 // Parse the date / time
 var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S"),
-    bisectDate = d3.bisector(function(d) { return d.date; }).left,
+    bisectDate = d3.bisector(function(d) { return d.ts; }).left,
     formatValue = function(d) { return d + "kW"; };
 
 // Function to add a linear graph
@@ -29,14 +29,14 @@ function addGraph(position, php){
     // Area under the line
     var area = d3.area()
         .curve(d3.curveCardinal)
-        .x(function(d) { return x(d.date); })
+        .x(function(d) { return x(d.ts); })
         .y0(height)
-        .y1(function(d) { return y(d.value); });
+        .y1(function(d) { return y(d.iinst); });
     // Define the line
     var valueline = d3.line()
         .curve(d3.curveCardinal)
-        .x(function(d) { return x(d.date); })
-        .y(function(d) { return y(d.value); });
+        .x(function(d) { return x(d.ts); })
+        .y(function(d) { return y(d.iinst); });
 
     // Adds the svg canvas
     var svg = d3.select(position)
@@ -49,12 +49,12 @@ function addGraph(position, php){
     // Get the data
     d3.json(php, function(error, data) {
         data.forEach(function(d) {
-            d.date = parseDate(d.ts);
-            d.value = +d.value;
+            d.ts = parseDate(d.ts);
+            d.iinst = +d.iinst;
         });
         // Scale the range of the data
-        x.domain(d3.extent(data, function(d) { return d.date; }));
-        y.domain([0, d3.max(data, function(d) { return d.value; })]);
+        x.domain(d3.extent(data, function(d) { return d.ts; }));
+        y.domain([0, d3.max(data, function(d) { return d.iinst; })]);
         svg.append("path")
             .data([data])
             .attr("class", "area")
@@ -108,9 +108,9 @@ function addGraph(position, php){
                 i = bisectDate(data, x0, 1),
                 d0 = data[i - 1],
                 d1 = data[i],
-                d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-            focus.attr("transform", "translate(" + x(d.date) + "," + y(d.value) + ")");
-            focus.select("text").text(formatValue(d.value));
+                d = x0 - d0.ts > d1.ts - x0 ? d1 : d0;
+            focus.attr("transform", "translate(" + x(d.ts) + "," + y(d.iinst) + ")");
+            focus.select("text").text(formatValue(d.iinst));
         }
     });
 }
@@ -144,14 +144,14 @@ function addBarGraph(position, php){
     // Get the data
     d3.json(php, function(error, data) {
         data.forEach(function(d) {
-            d.date = parseDate(d.ts);
-            d.hc = +d.value;
-            d.hp = +d.value;
+            d.ts = parseDate(d.ts);
+            d.hc = +d.hchc;
+            d.hp = +d.hchp;
         });
         data.sort(function(a, b) { return b.total - a.total; });
         data.columns = ["date", "hc", "hp"];
         // Scale the range of the data
-        x.domain(data.map(function(d) { return d.date; }));
+        x.domain(data.map(function(d) { return d.ts; }));
         y.domain([0, d3.max(data, function(d) { return d.hp + d.hc; })]);
         z.domain(data.columns.slice(1));
         var serie = svg.selectAll(".serie")
@@ -162,7 +162,7 @@ function addBarGraph(position, php){
         serie.selectAll("rect")
            .data(function(d) { return d; })
            .enter().append("rect")
-               .attr("x", function(d) { return x(d.data.date); })
+               .attr("x", function(d) { return x(d.data.ts); })
                .attr("y", function(d) { return y(d[1]); })
                .attr("height", function(d) { return y(d[0]) - y(d[1]); })
                .attr("width", x.bandwidth());
