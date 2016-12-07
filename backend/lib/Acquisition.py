@@ -35,7 +35,7 @@ class Acquisition(object):
                 # Every 30, update the info
                 logging.info("Update info")
                 try:
-                    wDb.UpdateInfo(wDic['ADCO'], wDic['OPTARIF'], wDic['ISOUSC'])
+                    wDb.UpdateInfo(wDic['ADCO'], wDic['OPTARIF'], wDic['ISOUSC'], wDic['IMAX'])
                 except Exception as e:
                     logging.error("Update info error: {0}".format(e))
                 self._PreviousTime = wCurrentTime

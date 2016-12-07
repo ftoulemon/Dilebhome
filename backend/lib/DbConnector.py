@@ -57,6 +57,8 @@ class DbConnector(object):
             self._Cursor.execute("CREATE TABLE IF NOT EXISTS {0} "
                     "(adco VARCHAR(15) NOT NULL, "
                     "optarif VARCHAR(5), "
+                    "isousc VARCHAR(5), "
+                    "imax VARCHAR(5), "
                     "UNIQUE (adco))"
                     .format(self.INFO_TABLE))
         except Exception as e:
@@ -85,17 +87,17 @@ class DbConnector(object):
                .format(self.SYSTEM_TABLE, aDU))
         self._Cursor.execute(wCommand)
 
-    def UpdateInfo(self, aADCO, aOPTARIF, aISOUSC):
+    def UpdateInfo(self, aADCO, aOPTARIF, aISOUSC, aIMAX):
         """
         Update the information table
         """
         wCommand = ("INSERT INTO {0} "
-               "(adco, optarif, isousc) "
+               "(adco, optarif, isousc, imax) "
                "VALUES "
-               "('{1}', '{2}', '{3}') "
+               "('{1}', '{2}', '{3}', '{4}') "
                "ON DUPLICATE KEY UPDATE "
-               "optarif='{2}', isousc='{3}'"
-               .format(self.INFO_TABLE, aADCO, aOPTARIF, aISOUSC))
+               "optarif='{2}', isousc='{3}', imax='{4}'"
+               .format(self.INFO_TABLE, aADCO, aOPTARIF, aISOUSC, aIMAX))
         self._Cursor.execute(wCommand)
 
     def SaveRecord(self, aRecord):
