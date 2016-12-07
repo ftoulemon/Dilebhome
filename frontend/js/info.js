@@ -21,6 +21,7 @@ function printCompteurInfo(text) {
     document.getElementById("adco").innerHTML = data.adco;
     document.getElementById("optarif").innerHTML = data.optarif;
     document.getElementById("isousc").innerHTML = data.isousc;
+    document.getElementById("imax").innerHTML = data.imax;
 }
 
 function printSystemInfo(text) {
