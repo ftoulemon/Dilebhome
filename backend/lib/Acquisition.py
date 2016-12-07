@@ -38,6 +38,10 @@ class Acquisition(object):
                     wDb.UpdateInfo(wDic['ADCO'], wDic['OPTARIF'], wDic['ISOUSC'], wDic['IMAX'])
                 except Exception as e:
                     logging.error("Update info error: {0}".format(e))
+                try:
+                    wDb.SaveRecord(wDic['IINST'], wDic['HCHC'], wDic['HCHP'])
+                except Exception as e:
+                    logging.error("Save record error: {0}".format(e))
                 self._PreviousTime = wCurrentTime
 
 

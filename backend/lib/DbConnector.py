@@ -47,7 +47,9 @@ class DbConnector(object):
         # Record table
         try:
             self._Cursor.execute("CREATE TABLE IF NOT EXISTS {0} "
-                    "(value INT, "
+                    "(iinst INT, "
+                    "hchc INT, "
+                    "hchp INT, "
                     "ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)"
                     .format(self.RECORDS_TABLE))
         except Exception as e:
@@ -100,14 +102,14 @@ class DbConnector(object):
                .format(self.INFO_TABLE, aADCO, aOPTARIF, aISOUSC, aIMAX))
         self._Cursor.execute(wCommand)
 
-    def SaveRecord(self, aRecord):
+    def SaveRecord(self, aIINST, aHCHC, aHCHP):
         """
         Insert a new record in the records table
         """
-        wCommand = ("INSERT INTO {0} (value) "
+        wCommand = ("INSERT INTO {0} (iinst, hchc, hchp) "
                             "VALUES "
-                            "({1})"
-                            .format(self.RECORDS_TABLE, aRecord))
+                            "({1}, {2}, {3})"
+                            .format(self.RECORDS_TABLE, aIINST, aHCHC, aHCHP))
         self._Cursor.execute(wCommand)
 
 
