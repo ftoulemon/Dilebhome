@@ -1,0 +1,77 @@
+path { 
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: None;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+.axis text {
+    fill: lightgrey;
+}
+.tick line{
+    opacity: 0.3;
+}
+
+svg text{
+    fill: lightgrey;
+}
+
+.area {
+    fill: #546e7a;
+    stroke-width: 0;
+    opacity: 0.8;
+}
+
+.overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+.focus circle {
+    fill: steelblue;
+}
+
+.switch label {
+    cursor: default;
+}
+.switch label input[type=checkbox]:disabled:checked+.lever {
+    background-color: #64b5f6;
+}
+.switch label input[type=checkbox]:disabled:checked+.lever:after {
+    background-color: #2196f3;
+}
+.switch label input[type=checkbox]:disabled:not(checked)+.lever {
+    background-color: gray;
+}
+.switch label input[type=checkbox]:disabled:not(checked)+.lever:after {
+    background-color: white;
+}
+
+.gauge-board {
+    text-align: center;
+}
+
+meter::-webkit-meter-bar {
+    width: 120px;
+    background: #EEE;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.2) inset;
+    border-radius: 3px;
+}
+meter::-webkit-meter-optimum-value {
+    background: #86CC00; /* Green */
+    border-radius: 3px;
+}
+meter::-webkit-meter-suboptimum-value {
+    background: #FFDB1A; /* Yellow */
+    border-radius: 3px;
+}
+meter::-webkit-meter-even-less-good-value {
+    background: #CC4600; /* Red */
+    border-radius: 3px;
+}
