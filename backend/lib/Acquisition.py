@@ -16,6 +16,31 @@ class Acquisition(object):
         self._PreviousTime = datetime.datetime.now()
 
 
+    def __UpdateInfo(self, aDb, aADCO, aOPTARIF, aISOUSC, aIMAX):
+        """
+        Save the info
+        """
+        aDb.UpdateInfo(aADCO, aOPTARIF, aISOUSC, aIMAX)
+
+    def __SaveRecord(self, aDb, aTable, aHCHC, aHCHP):
+        """
+        Save new record
+        """
+        # Get last data
+        wLast = aDb.GetLastRecord(aTable)
+        logging.debug("Last: {0}".format(wLast))
+        if wLast:
+            try:
+                aDb.SaveRecord(aTable,
+                        aHCHC, aHCHP,
+                        int(aHCHC) - int(wLast['hchc']),
+                        int(aHCHP) - int(wLast['hchp']))
+            except Exception as e:
+                logging.warning("Can't save data: {0}".format(e))
+        else:
+            aDb.SaveRecord(aTable,
+                    aHCHC, aHCHP, 0, 0)
+
     def __ProcessFrame(self, aFrame):
         """
         Save the data in the the database
@@ -35,11 +60,14 @@ class Acquisition(object):
                 # Every 30, update the info
                 logging.info("Update info")
                 try:
-                    wDb.UpdateInfo(wDic['ADCO'], wDic['OPTARIF'], wDic['ISOUSC'], wDic['IMAX'])
+                    # save info
+                    self.__UpdateInfo(wDb, wDic['ADCO'], wDic['OPTARIF'], wDic['ISOUSC'], wDic['IMAX'])
                 except Exception as e:
                     logging.error("Update info error: {0}".format(e))
                 try:
-                    wDb.SaveRecord(wDic['IINST'], wDic['HCHC'], wDic['HCHP'])
+                    # save new record
+                    self.__SaveRecord(wDb, aDb.RECORDS_M_TABLE,
+                            wDic['HCHC'], wDic['HCHP'])
                 except Exception as e:
                     logging.error("Save record error: {0}".format(e))
                 self._PreviousTime = wCurrentTime
@@ -75,7 +103,8 @@ class Acquisition(object):
                     wFrame = ''
                 elif wByte == END_OF_FRAME:
                     self.__ProcessFrame(wFrame)
-                    time.sleep(1)
+                    # sleep almost 1 minute
+                    time.sleep(10)
                 else:
                     wFrame += wByte
             except Exception as e:
