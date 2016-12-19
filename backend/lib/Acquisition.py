@@ -1,8 +1,6 @@
 # coding: utf-8
 
 import serial
-import time
-import datetime
 import logging
 
 from DbConnector import DbConnector
@@ -13,7 +11,6 @@ class Acquisition(object):
         Constructor
         """
         self._StopRequested = False
-        self._PreviousTime = datetime.datetime.now()
 
 
     def __UpdateInfo(self, aDb, aADCO, aOPTARIF, aISOUSC, aIMAX):
@@ -41,11 +38,10 @@ class Acquisition(object):
             aDb.SaveRecord(aTable,
                     aHCHC, aHCHP, 0, 0)
 
-    def __ProcessFrame(self, aFrame):
+    def ProcessFrame(self, aTable, aFrame):
         """
         Save the data in the the database
         """
-        wCurrentTime = datetime.datetime.now()
         # TODO: test frame integrity
         # Frame to dictionary
         wDic = {}
@@ -56,21 +52,21 @@ class Acquisition(object):
         logging.debug(wDic)
         # Save data in DB
         with DbConnector() as wDb:
-            if (wCurrentTime - self._PreviousTime).seconds >= 5:
-                # Every 30, update the info
+            if aTable == wDb.RECORDS_M_TABLE:
+                # Update the info
                 logging.info("Update info")
                 try:
                     # save info
-                    self.__UpdateInfo(wDb, wDic['ADCO'], wDic['OPTARIF'], wDic['ISOUSC'], wDic['IMAX'])
+                    self.__UpdateInfo(wDb, wDic['ADCO'], wDic['OPTARIF'],
+                            wDic['ISOUSC'], wDic['IMAX'])
                 except Exception as e:
                     logging.error("Update info error: {0}".format(e))
-                try:
-                    # save new record
-                    self.__SaveRecord(wDb, aDb.RECORDS_M_TABLE,
-                            wDic['HCHC'], wDic['HCHP'])
-                except Exception as e:
-                    logging.error("Save record error: {0}".format(e))
-                self._PreviousTime = wCurrentTime
+            # save new record
+            try:
+                self.__SaveRecord(wDb, aTable,
+                        wDic['HCHC'], wDic['HCHP'])
+            except Exception as e:
+                logging.error("Save record error: {0}".format(e))
 
 
     def GetData(self):
@@ -89,7 +85,7 @@ class Acquisition(object):
                     timeout=10)
         except Exception as e:
             logging.error("Can't open serial: {0}".format(e))
-            return
+            return None
         wByte = ''
         wFrame = ''
         # Seek start of frame
@@ -102,9 +98,7 @@ class Acquisition(object):
                 if wByte == START_OF_FRAME:
                     wFrame = ''
                 elif wByte == END_OF_FRAME:
-                    self.__ProcessFrame(wFrame)
-                    # sleep almost 1 minute
-                    time.sleep(10)
+                    self._StopRequested = True
                 else:
                     wFrame += wByte
             except Exception as e:
@@ -115,6 +109,8 @@ class Acquisition(object):
             wPort.close()
         except exception as e:
             logging.error("IO error: {0}".format(e))
+            return None
+        return wFrame
 
     def Stop(self):
         self._StopRequested = True

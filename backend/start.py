@@ -13,10 +13,18 @@ from lib.SystemMonitor import SystemMonitor
 acq = Acquisition()
 sm = SystemMonitor()
 
+dicTable = {
+       'minute': DbConnector.RECORDS_M_TABLE,
+       'hour': DbConnector.RECORDS_H_TABLE,
+       'day': DbConnector.RECORDS_D_TABLE,
+       'month': DbConnector.RECORDS_O_TABLE,
+       'year': DbConnector.RECORDS_Y_TABLE
+}
+
+
 def signalHandler(signal, frame):
     logging.warning("Caught ^C")
     acq.Stop()
-    sm.Stop()
 
 
 if __name__ == "__main__":
@@ -25,6 +33,10 @@ if __name__ == "__main__":
             )
     parser.add_argument("-v", "--verbose", help="Verbositiy setting",
             action="count", default=0)
+    parser.add_argument("-p", "--period", help="Period to record",
+            default='minute',
+            choices=dicTable.keys()
+            )
     args = parser.parse_args()
     # configure logging
     if args.verbose == 1:
@@ -42,8 +54,12 @@ if __name__ == "__main__":
     # start things
     with DbConnector() as wDb:
         wDb.Init()
-    sm.start()
-    acq.GetData()
+    # data
+    wFrame = acq.GetData()
+    acq.ProcessFrame(dicTable[args.period], wFrame)
+    # system monitoring
+    if args.period == 'minute':
+        sm.Monitor()
     # exit things
     sys.exit(0)
 
