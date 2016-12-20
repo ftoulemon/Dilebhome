@@ -40,15 +40,15 @@ def SetupCrontab():
     # Clear existing jobs, if any
     wCron.remove_all(command=wFile)
     # Create jobs
-    wJobminute = wCron.new(command=wFile + ' -p minute', user='root')
+    wJobminute = wCron.new(command=wFile + ' -vvv -p minute', user='root')
     wJobminute.setall('* * * * *')
-    wJobhour = wCron.new(command=wFile + ' -p hour', user='root')
+    wJobhour = wCron.new(command=wFile + ' -vvv -p hour', user='root')
     wJobhour.setall('@hourly')
-    wJobday = wCron.new(command=wFile + ' -p day', user='root')
+    wJobday = wCron.new(command=wFile + ' -vvv -p day', user='root')
     wJobday.setall('@daily')
-    wJobmonth = wCron.new(command=wFile + ' -p month', user='root')
+    wJobmonth = wCron.new(command=wFile + ' -vvv -p month', user='root')
     wJobmonth.setall('@monthly')
-    wJobyear = wCron.new(command=wFile + ' -p year', user='root')
+    wJobyear = wCron.new(command=wFile + ' -vvv -p year', user='root')
     wJobyear.setall('@yearly')
     # Save
     wCron.write()
@@ -76,8 +76,9 @@ if __name__ == "__main__":
         wLogLevel = logging.DEBUG
     else:
         wLogLevel = logging.ERROR
-    logging.basicConfig(level=wLogLevel)
-    logging.info('Started')
+    logging.basicConfig(filename='/var/log/dilebhome.log', level=wLogLevel)
+    logging.getLogger().addHandler(logging.StreamHandler())
+    logging.info('Started {0}'.format(args.period))
     # signal handling
     signal.signal(signal.SIGINT, signalHandler)
     if args.setup is True:
