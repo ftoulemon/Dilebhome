@@ -66,9 +66,10 @@ class Acquisition(object):
             try:
                 self.__SaveRecord(wDb, aTable,
                         wDic['HCHC'], wDic['HCHP'])
+                logging.info("Record saved to {0}".format(aTable))
                 wRet = True
             except Exception as e:
-                logging.error("Save record error: {0}".format(e))
+                logging.error("Save record error: {0}. Frame: {1}. Dic: {2}".format(e, aFrame, wDic))
         return wRet
 
 
@@ -85,21 +86,23 @@ class Acquisition(object):
                     bytesize=serial.SEVENBITS,
                     stopbits=serial.STOPBITS_ONE,
                     parity=serial.PARITY_ODD,
-                    timeout=5)
+                    timeout=10)
         except Exception as e:
             logging.error("Can't open serial: {0}".format(e))
             return None
         wByte = ''
         wFrame = ''
         wNbRead = 0
+        wTimeout = 0
         # Seek start of frame
-        while wByte != START_OF_FRAME and wNbRead < 100:
+        while wByte != START_OF_FRAME and wNbRead < 100 and wTimeout < 3:
             wNbRead += 1
             wByte = wPort.read()
-
+            if wByte is None or wByte == '':
+                wTimeout += 1
         # Main loop
         wNbRead = 0
-        while not self._StopRequested and wNbRead < 100:
+        while not self._StopRequested and wNbRead < 100 and wTimeout < 3:
             try:
                 wByte = wPort.read()
                 if wByte == START_OF_FRAME:
@@ -116,6 +119,8 @@ class Acquisition(object):
         if wNbRead >= 100:
             # Frame not detected
             wFrame = ''
+        if wTimeout >= 3:
+            logging.warning("Get data timeout")
         # close port
         try:
             wPort.close()
