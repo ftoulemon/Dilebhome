@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import sys
 import serial
 import logging
 
@@ -102,7 +103,9 @@ class Acquisition(object):
                 wTimeout += 1
         # Main loop
         wNbRead = 0
-        while not self._StopRequested and wNbRead < 100 and wTimeout < 3:
+        self._StopRequested = False
+        while self._StopRequested is False and wNbRead < 500 and wTimeout < 3:
+            wNbRead += 1
             try:
                 wByte = wPort.read()
                 if wByte == START_OF_FRAME:
@@ -115,8 +118,7 @@ class Acquisition(object):
                 logging.error("Read error: {0}".format(e))
                 wFrame = ''
                 self._StopRequested = True
-            wNbRead += 1
-        if wNbRead >= 100:
+        if wNbRead >= 500:
             # Frame not detected
             wFrame = ''
         if wTimeout >= 3:
