@@ -87,8 +87,14 @@ if __name__ == "__main__":
             wDb.Init()
     else:
         # data
-        wFrame = acq.GetData()
-        acq.ProcessFrame(dicTable[args.period], wFrame)
+        wRetry = 3
+        while wRetry > 0:
+            wRetry -= 1
+            wFrame = acq.GetData()
+            if wFrame != None and wFrame != '':
+                wRet = acq.ProcessFrame(dicTable[args.period], wFrame)
+                if wRet == True:
+                    wRetry = 0
         # system monitoring
         if args.period == 'minute':
             sm.Monitor()

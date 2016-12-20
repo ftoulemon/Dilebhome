@@ -42,6 +42,7 @@ class Acquisition(object):
         """
         Save the data in the the database
         """
+        wRet = False
         # TODO: test frame integrity
         # Frame to dictionary
         wDic = {}
@@ -65,8 +66,10 @@ class Acquisition(object):
             try:
                 self.__SaveRecord(wDb, aTable,
                         wDic['HCHC'], wDic['HCHP'])
+                wRet = True
             except Exception as e:
                 logging.error("Save record error: {0}".format(e))
+        return wRet
 
 
     def GetData(self):
