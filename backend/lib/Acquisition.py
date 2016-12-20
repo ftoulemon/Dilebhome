@@ -85,15 +85,18 @@ class Acquisition(object):
                     bytesize=serial.SEVENBITS,
                     stopbits=serial.STOPBITS_ONE,
                     parity=serial.PARITY_ODD,
-                    timeout=10)
+                    timeout=5)
         except Exception as e:
             logging.error("Can't open serial: {0}".format(e))
             return None
         wByte = ''
         wFrame = ''
+        wNbRead = 0
         # Seek start of frame
-        while wByte != START_OF_FRAME:
+        while wByte != START_OF_FRAME and wNbRead < 100:
+            wNbRead += 1
             wByte = wPort.read()
+
         # Main loop
         wNbRead = 0
         while not self._StopRequested and wNbRead < 100:
