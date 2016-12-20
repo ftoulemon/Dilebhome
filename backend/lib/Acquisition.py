@@ -50,7 +50,7 @@ class Acquisition(object):
             wWord = i.split()
             if 3 == len(wWord):
                 wDic[wWord[0]] = wWord[1]
-        logging.debug(wDic)
+        logging.debug("Frame to process: {0}".format(wDic))
         # Save data in DB
         with DbConnector() as wDb:
             if aTable == wDb.RECORDS_M_TABLE:
@@ -69,7 +69,7 @@ class Acquisition(object):
                 logging.info("Record saved to {0}".format(aTable))
                 wRet = True
             except Exception as e:
-                logging.error("Save record error: {0}. Frame: {1}. Dic: {2}".format(e, aFrame, wDic))
+                logging.error("Save record error: {0}".format(e))
         return wRet
 
 
