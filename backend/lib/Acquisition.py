@@ -95,7 +95,8 @@ class Acquisition(object):
         while wByte != START_OF_FRAME:
             wByte = wPort.read()
         # Main loop
-        while not self._StopRequested:
+        wNbRead = 0
+        while not self._StopRequested and wNbRead < 100:
             try:
                 wByte = wPort.read()
                 if wByte == START_OF_FRAME:
@@ -106,11 +107,16 @@ class Acquisition(object):
                     wFrame += wByte
             except Exception as e:
                 logging.error("Read error: {0}".format(e))
+                wFrame = ''
                 self._StopRequested = True
+            wNbRead += 1
+        if wNbRead >= 100:
+            # Frame not detected
+            wFrame = ''
         # close port
         try:
             wPort.close()
-        except exception as e:
+        except Exception as e:
             logging.error("IO error: {0}".format(e))
             return None
         return wFrame
