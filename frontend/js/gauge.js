@@ -15,21 +15,21 @@
  var majorGraduationTextSize = 12;
  var needleValueTextSize = 12;
 
- var maxLimit = 6;
+ var maxLimit = 300;
  var minLimit = 0;
 
  var scope = {
-    value: 1.5,
-    upperLimit: 6,
+    value: 0,
+    upperLimit: 300,
     lowerLimit: 0,
-    valueUnit: "kW",
-    precision: 2,
+    valueUnit: "W",
+    precision: 0,
     ranges: [
-        { min: 0, max: 1.5, color: '#DEDEDE' },
-        { min: 1.5, max: 2.5, color: '#8DCA2F' },
-        { min: 2.5, max: 3.5, color: '#FDC702' },
-        { min: 3.5, max: 4.5, color: '#FF7700' },
-        { min: 4.5, max: 6.0, color: '#C50200' } ]
+        { min: 0, max: 100, color: '#DEDEDE' },
+        { min: 100, max: 150, color: '#8DCA2F' },
+        { min: 150, max: 200, color: '#FDC702' },
+        { min: 200, max: 250, color: '#FF7700' },
+        { min: 250, max: 300, color: '#C50200' } ]
  };
 
 var svg;
@@ -190,7 +190,7 @@ var svg;
      svg.selectAll('.mtt-graduation-needle').remove();
      svg.selectAll('.mtt-graduationValueText').remove();
      svg.selectAll('.mtt-graduation-needle-center').remove();
-     
+
      var centerX = width / 2;
      var centerY = width / 2;
      var centerColor;
@@ -280,5 +280,24 @@ var svg;
      renderGraduationNeedle(minLimit, maxLimit);
  }
 
-addGauge("#gauge1");
-addGauge("#gauge2");
+function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.send(null);
+}
+
+function gaugeCallback(text) {
+    data = JSON.parse(text);
+    scope.value = parseInt(data[0].hchcd);
+    addGauge("#gauge1");
+
+    scope.value = parseInt(data[0].hchpd);
+    addGauge("#gauge2");
+}
+
+httpGetAsync("dbCon.php?data=last", gaugeCallback);

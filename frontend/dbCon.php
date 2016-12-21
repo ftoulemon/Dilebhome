@@ -17,7 +17,21 @@
         echo json_encode(mysql_fetch_assoc($query));
     }
     else {
-        $myquery = "SELECT  `ts`, `iinst`, `hchc`, `hchp` FROM `records`";
+        if ($_GET['data'] == 'last') {
+            $myquery = "SELECT * FROM `records_minute` ORDER BY ts DESC LIMIT 1";
+        }
+        else if ($_GET['period'] == 'todayMinute') {
+            $myquery = "SELECT * FROM `records_minute` WHERE DATE(`ts`) = CURDATE()";
+        }
+        else if ($_GET['period'] == 'todayHour') {
+            $myquery = "SELECT * FROM `records_hour` WHERE DATE(`ts`) = CURDATE()";
+        }
+        else if ($_GET['period'] == 'month') {
+            $myquery = "SELECT * FROM `records_month`";
+        }
+        else {
+            $myquery = '';
+        }
         $query = mysql_query($myquery);
 
         if ( ! $query ) {

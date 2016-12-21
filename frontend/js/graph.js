@@ -1,6 +1,6 @@
 // Set the dimensions of the canvas / graph
 var margin = {top: 30, right: 10, bottom: 140, left: 50},
-    width = parseInt(d3.select('#graph1').style('width'), 10),
+    width = parseInt(d3.select('#graphMonth').style('width'), 10),
     width = width - margin.left - margin.right,
     barHeight = 20,
     height = 400 - margin.top - margin.bottom,
@@ -31,12 +31,12 @@ function addGraph(position, php){
         .curve(d3.curveCardinal)
         .x(function(d) { return x(d.ts); })
         .y0(height)
-        .y1(function(d) { return y(d.iinst); });
+        .y1(function(d) { return y(d.hchcd); });
     // Define the line
     var valueline = d3.line()
         .curve(d3.curveCardinal)
         .x(function(d) { return x(d.ts); })
-        .y(function(d) { return y(d.iinst); });
+        .y(function(d) { return y(d.hchcd); });
 
     // Adds the svg canvas
     var svg = d3.select(position)
@@ -50,11 +50,11 @@ function addGraph(position, php){
     d3.json(php, function(error, data) {
         data.forEach(function(d) {
             d.ts = parseDate(d.ts);
-            d.iinst = +d.iinst;
+            d.hchcd = +d.hchcd;
         });
         // Scale the range of the data
         x.domain(d3.extent(data, function(d) { return d.ts; }));
-        y.domain([0, d3.max(data, function(d) { return d.iinst; })]);
+        y.domain([0, d3.max(data, function(d) { return d.hchcd; })]);
         svg.append("path")
             .data([data])
             .attr("class", "area")
@@ -109,8 +109,8 @@ function addGraph(position, php){
                 d0 = data[i - 1],
                 d1 = data[i],
                 d = x0 - d0.ts > d1.ts - x0 ? d1 : d0;
-            focus.attr("transform", "translate(" + x(d.ts) + "," + y(d.iinst) + ")");
-            focus.select("text").text(formatValue(d.iinst));
+            focus.attr("transform", "translate(" + x(d.ts) + "," + y(d.hchcd) + ")");
+            focus.select("text").text(formatValue(d.hchcd));
         }
     });
 }
@@ -145,8 +145,8 @@ function addBarGraph(position, php){
     d3.json(php, function(error, data) {
         data.forEach(function(d) {
             d.ts = parseDate(d.ts);
-            d.hc = +d.hchc;
-            d.hp = +d.hchp;
+            d.hc = +d.hchcd;
+            d.hp = +d.hchpd;
         });
         data.sort(function(a, b) { return b.total - a.total; });
         data.columns = ["date", "hc", "hp"];
@@ -208,5 +208,6 @@ function addBarGraph(position, php){
     });
 }
 
-addGraph("#graph1", "dbCon.php");
-addBarGraph("#graph2", "dbCon.php");
+addGraph("#graphTodayMinutes", "dbCon.php?period=todayMinute");
+addBarGraph("#graphToday", "dbCon.php?period=todayHour");
+addBarGraph("#graphMonth", "dbCon.php?period=month");
