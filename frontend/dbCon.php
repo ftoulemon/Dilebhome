@@ -27,7 +27,7 @@
             $myquery = "SELECT * FROM `records_hour` WHERE DATE(`ts`) = CURDATE()";
         }
         else if ($_GET['period'] == 'month') {
-            $myquery = "SELECT * FROM `records_month`";
+            $myquery = "SELECT * FROM `records_day`";
         }
         else {
             $myquery = '';
