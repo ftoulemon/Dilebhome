@@ -9,7 +9,7 @@ var margin = {top: 30, right: 10, bottom: 140, left: 50},
 // Parse the date / time
 var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S"),
     bisectDate = d3.bisector(function(d) { return d.ts; }).left,
-    formatValue = function(d) { return d + "kW"; };
+    formatValue = function(d) { return d + "Wh"; };
 
 // Function to add a linear graph
 function addGraph(position, php){
@@ -186,7 +186,7 @@ function addBarGraph(position, php){
            .attr("dy", "0.35em")
            .attr("text-anchor", "start")
            .attr("fill", "#000")
-           .text("kWh");
+           .text("Wh");
         var legend = svg.selectAll(".legend")
          .data(data.columns.slice(1).reverse())
          .enter().append("g")
