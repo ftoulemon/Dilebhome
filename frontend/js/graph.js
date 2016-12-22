@@ -121,7 +121,7 @@ function addBarGraph(position, php){
     // axis
     var x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
     var y = d3.scaleLinear().rangeRound([height, 0]);
-    var z = d3.scaleOrdinal().range(["#81d4fa", "#4fc3f7"]);
+    var z = d3.scaleOrdinal().range(["#81d4fa", "#4fa0f7"]);
     var stack = d3.stack();
     // Define the axes
     var xAxis = d3.axisBottom(x)
@@ -148,9 +148,8 @@ function addBarGraph(position, php){
             d.hc = +d.hchcd;
             d.hp = +d.hchpd;
         });
-        data.sort(function(a, b) { return b.total - a.total; });
+        // data.sort(function(a, b) { return b.total - a.total; });
         data.columns = ["date", "hc", "hp"];
-        // Scale the range of the data
         x.domain(data.map(function(d) { return d.ts; }));
         y.domain([0, d3.max(data, function(d) { return d.hp + d.hc; })]);
         z.domain(data.columns.slice(1));
