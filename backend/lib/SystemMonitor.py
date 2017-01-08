@@ -15,6 +15,9 @@ class SystemMonitor(object):
         wUsedPercent = int(100 * (wTotal - wAvail) / wTotal)
         logging.info("Disk usage: {0}%".format(wUsedPercent))
         with DbConnector() as wDb:
-            wDb.UpdateSystem(wUsedPercent)
+            if wDb is None:
+                logging.error("Cannot connect to DB")
+            else:
+                wDb.UpdateSystem(wUsedPercent)
 
 

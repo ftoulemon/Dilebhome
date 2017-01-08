@@ -54,6 +54,9 @@ class Acquisition(object):
         logging.debug("Frame to process: {0}".format(wDic))
         # Save data in DB
         with DbConnector() as wDb:
+            if wDb is None:
+                logging.error("Cannot connect to DB")
+                return wRet
             if aTable == wDb.RECORDS_M_TABLE:
                 # Update the info
                 logging.info("Update info")

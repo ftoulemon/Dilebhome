@@ -6,6 +6,7 @@ import sys
 import signal
 import logging
 import argparse
+import datetime
 
 from crontab import CronTab
 
@@ -78,14 +79,16 @@ if __name__ == "__main__":
         wLogLevel = logging.ERROR
     logging.basicConfig(filename='/var/log/dilebhome.log', level=wLogLevel)
     logging.getLogger().addHandler(logging.StreamHandler())
-    logging.info('Started {0}'.format(args.period))
+    logging.info('------')
+    logging.info('[{0}] Started {1}'.format(datetime.datetime.today(), args.period))
     # signal handling
     signal.signal(signal.SIGINT, signalHandler)
     if args.setup is True:
         SetupCrontab()
         # start things
         with DbConnector() as wDb:
-            wDb.Init()
+            if wDb is not None:
+                wDb.Init()
     else:
         # data
         wRetry = 3
@@ -100,5 +103,6 @@ if __name__ == "__main__":
         if args.period == 'minute':
             sm.Monitor()
     # exit things
+    logging.info('Clean exit')
     sys.exit(0)
 
