@@ -85,53 +85,48 @@ class Acquisition(object):
         END_OF_FRAME = chr(3)
         # open the port
         try:
-            wPort = serial.Serial("/dev/ttyS0",
+            with serial.Serial("/dev/ttyS0",
                     baudrate=1200,
                     bytesize=serial.SEVENBITS,
                     stopbits=serial.STOPBITS_ONE,
                     parity=serial.PARITY_ODD,
-                    timeout=10)
+                    timeout=10) as wPort:
+                wByte = ''
+                wFrame = ''
+                wNbRead = 0
+                wTimeout = 0
+                # Seek start of frame
+                while wByte != START_OF_FRAME and wNbRead < 100 and wTimeout < 3:
+                    wNbRead += 1
+                    wByte = wPort.read()
+                    if wByte is None or wByte == '':
+                        wTimeout += 1
+                # Main loop
+                wNbRead = 0
+                self._StopRequested = False
+                while self._StopRequested is False and wNbRead < 500 and wTimeout < 3:
+                    wNbRead += 1
+                    try:
+                        wByte = wPort.read()
+                        if wByte == START_OF_FRAME:
+                            wFrame = ''
+                        elif wByte == END_OF_FRAME:
+                            self._StopRequested = True
+                        else:
+                            wFrame += wByte
+                    except Exception as e:
+                        logging.error("Read error: {0}".format(e))
+                        wFrame = ''
+                        self._StopRequested = True
+                if wNbRead >= 500:
+                    # Frame not detected
+                    wFrame = ''
+                if wTimeout >= 3:
+                    logging.warning("Get data timeout")
         except Exception as e:
             logging.error("Can't open serial: {0}".format(e))
             return None
-        wByte = ''
-        wFrame = ''
-        wNbRead = 0
-        wTimeout = 0
-        # Seek start of frame
-        while wByte != START_OF_FRAME and wNbRead < 100 and wTimeout < 3:
-            wNbRead += 1
-            wByte = wPort.read()
-            if wByte is None or wByte == '':
-                wTimeout += 1
-        # Main loop
-        wNbRead = 0
-        self._StopRequested = False
-        while self._StopRequested is False and wNbRead < 500 and wTimeout < 3:
-            wNbRead += 1
-            try:
-                wByte = wPort.read()
-                if wByte == START_OF_FRAME:
-                    wFrame = ''
-                elif wByte == END_OF_FRAME:
-                    self._StopRequested = True
-                else:
-                    wFrame += wByte
-            except Exception as e:
-                logging.error("Read error: {0}".format(e))
-                wFrame = ''
-                self._StopRequested = True
-        if wNbRead >= 500:
-            # Frame not detected
-            wFrame = ''
-        if wTimeout >= 3:
-            logging.warning("Get data timeout")
         # close port
-        try:
-            wPort.close()
-        except Exception as e:
-            logging.error("IO error: {0}".format(e))
-            return None
         return wFrame
 
     def Stop(self):
