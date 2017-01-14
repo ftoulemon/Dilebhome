@@ -215,14 +215,14 @@ function addBarGraph(position, php){
            .attr("class", "legend")
            .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
            .style("font", "10px sans-serif");
-        width = parseInt(d3.select(position).style("width"));
+        widthGraph = parseInt(d3.select(position).style("width"));
         legend.append("rect")
-           .attr("x", width - 88)
+           .attr("x", widthGraph - 88)
            .attr("width", 18)
            .attr("height", 18)
            .attr("fill", z);
         legend.append("text")
-           .attr("x", width - 94)
+           .attr("x", widthGraph - 94)
            .attr("y", 9)
            .attr("dy", ".35em")
            .attr("text-anchor", "end")
@@ -230,15 +230,17 @@ function addBarGraph(position, php){
     });
 }
 
-addGraph("#graphTodayMinutes", "dbCon.php?period=todayMinute");
-addBarGraph("#graphToday", "dbCon.php?period=todayHour");
+addGraph("#graphMinute", "dbCon.php?period=minute");
+addBarGraph("#graphHour", "dbCon.php?period=hour");
 addBarGraph("#graphMonth", "dbCon.php?period=month");
 
 // Initialize date picker
 var datepicker = $('.datepicker').pickadate({
     selectMonths: true, // Creates a dropdown to control month
     selectYears: 10, // Creates a dropdown of 15 years to control year
+    format: 'yyyy-mm-dd',
     onClose: function () {
-        addGraph("#graphTodayMinutes", "dbCon.php?period=todayMinute")
+        addGraph("#graphMinute", "dbCon.php?period=minute&date="+datepicker[0].value);
+        $(document.activeElement).blur();
     }
 });

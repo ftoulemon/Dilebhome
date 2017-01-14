@@ -1,21 +1,19 @@
-var GAUGE_WIDTH = 300;
-
-var width = GAUGE_WIDTH;
-var innerRadius = Math.round((width * 130) / 300);
-var outterRadius = Math.round((width * 145) / 300);
-var majorGraduations = 5;
-var minorGraduations = 10;
-var majorGraduationLenght = Math.round((width * 16) / 300);
-var minorGraduationLenght = Math.round((width * 10) / 300);
-var majorGraduationMarginTop = Math.round((width * 7) / 300);
-var majorGraduationColor = "#B0B0B0";
-var minorGraduationColor = "#D0D0D0";
-var majorGraduationTextColor = "#6C6C6C";
-var needleColor = "#416094";
-var valueVerticalOffset = Math.round((width * 30) / 300);
-var unactiveColor = "#D7D7D7";
-var majorGraduationTextSize = 12;
-var needleValueTextSize = 12;
+const  widthGauge = 300;
+const innerRadius = Math.round((widthGauge * 130) / 300);
+const outterRadius = Math.round((widthGauge * 145) / 300);
+const majorGraduations = 5;
+const minorGraduations = 10;
+const majorGraduationLenght = Math.round((widthGauge * 16) / 300);
+const minorGraduationLenght = Math.round((widthGauge * 10) / 300);
+const majorGraduationMarginTop = Math.round((widthGauge * 7) / 300);
+const majorGraduationColor = "#B0B0B0";
+const minorGraduationColor = "#D0D0D0";
+const majorGraduationTextColor = "#6C6C6C";
+const needleColor = "#416094";
+const valueVerticalOffset = Math.round((widthGauge * 30) / 300);
+const unactiveColor = "#D7D7D7";
+const majorGraduationTextSize = 12;
+const needleValueTextSize = 12;
 
 var maxLimit = 300;
 var minLimit = 0;
@@ -37,18 +35,17 @@ var scope = {
 var svg;
 
 function addGauge(position){
-    width = GAUGE_WIDTH;
     svg = d3.select(position)
         .append('svg')
-        .attr('width', width)
-        .attr('height', width * 0.75);
+        .attr('width', widthGauge)
+        .attr('height', widthGauge * 0.75);
 
     render();
 }
 
 var renderMajorGraduations = function (majorGraduationsAngles) {
-    var centerX = width / 2;
-    var centerY = width / 2;
+    var centerX = widthGauge / 2;
+    var centerY = widthGauge / 2;
     //Render Major Graduations
     $.each(majorGraduationsAngles, function (index, value) {
         var cos1Adj = Math.round(Math.cos((90 - value) * Math.PI / 180) * (innerRadius - majorGraduationMarginTop - majorGraduationLenght));
@@ -83,8 +80,8 @@ var renderMinorGraduations = function (majorGraduationsAngles, indexMajor) {
             minorGraduationsAngles.push(scaleValue);
         }
 
-        var centerX = width / 2;
-        var centerY = width / 2;
+        var centerX = widthGauge / 2;
+        var centerY = widthGauge / 2;
         //Render Minor Graduations
         $.each(minorGraduationsAngles, function (indexMinor, value) {
             var cos1Adj = Math.round(Math.cos((90 - value) * Math.PI / 180) * (innerRadius - majorGraduationMarginTop - minorGraduationLenght));
@@ -131,13 +128,13 @@ var getMajorGraduationAngles = function () {
 var renderMajorGraduationTexts = function (majorGraduationsAngles, majorGraduationValues) {
     if (!scope.ranges) return;
 
-    var centerX = width / 2;
-    var centerY = width / 2;
+    var centerX = widthGauge / 2;
+    var centerY = widthGauge / 2;
     var textVerticalPadding = 5;
     var textHorizontalPadding = 5;
 
     var lastGraduationValue = majorGraduationValues[majorGraduationValues.length - 1];
-    var textSize = isNaN(majorGraduationTextSize) ? (width * 12) / 300 : majorGraduationTextSize;
+    var textSize = isNaN(majorGraduationTextSize) ? (widthGauge * 12) / 300 : majorGraduationTextSize;
     var fontStyle = textSize + "px";
 
     var dummyText = svg.append("text")
@@ -194,8 +191,8 @@ var renderGraduationNeedle = function (minLimit, maxLimit) {
     svg.selectAll('.mtt-graduationValueText').remove();
     svg.selectAll('.mtt-graduation-needle-center').remove();
 
-    var centerX = width / 2;
-    var centerY = width / 2;
+    var centerX = widthGauge / 2;
+    var centerY = widthGauge / 2;
     var centerColor;
 
     if (typeof scope.value === 'undefined') {
@@ -206,7 +203,7 @@ var renderGraduationNeedle = function (minLimit, maxLimit) {
         var thetaRad = needleValue * Math.PI / 180;
 
         var needleLen = innerRadius - majorGraduationLenght - majorGraduationMarginTop;
-        var needleRadius = (width * 2.5) / 300;
+        var needleRadius = (widthGauge * 2.5) / 300;
         var topX = centerX - needleLen * Math.cos(thetaRad);
         var topY = centerY - needleLen * Math.sin(thetaRad);
         var leftX = centerX - needleRadius * Math.cos(thetaRad - Math.PI / 2);
@@ -214,7 +211,7 @@ var renderGraduationNeedle = function (minLimit, maxLimit) {
         var rightX = centerX - needleRadius * Math.cos(thetaRad + Math.PI / 2);
         var rightY = centerY - needleRadius * Math.sin(thetaRad + Math.PI / 2);
         var triangle = "M " + leftX + " " + leftY + " L " + topX + " " + topY + " L " + rightX + " " + rightY;
-        var textSize = isNaN(needleValueTextSize) ? (width * 12) / 300 : needleValueTextSize;
+        var textSize = isNaN(needleValueTextSize) ? (widthGauge * 12) / 300 : needleValueTextSize;
         var fontStyle = textSize + "px";
 
         if (scope.value >= minLimit && scope.value <= maxLimit) {
@@ -237,7 +234,7 @@ var renderGraduationNeedle = function (minLimit, maxLimit) {
             .text('[ ' + scope.value.toFixed(scope.precision) + scope.valueUnit + ' ]');
     }
 
-    var circleRadius = (width * 6) / 300;
+    var circleRadius = (widthGauge * 6) / 300;
 
     svg.append("circle")
       .attr("r", circleRadius)
@@ -261,7 +258,7 @@ function render() {
     }
 
     //Render Gauge Color Area
-    var translate = "translate(" + width / 2 + "," + width / 2 + ")";
+    var translate = "translate(" + widthGauge / 2 + "," + widthGauge / 2 + ")";
     var cScale = d3.scaleLinear().domain([minLimit, maxLimit]).range([-120 * (Math.PI / 180), 120 * (Math.PI / 180)]);
     var arc = d3.arc()
         .innerRadius(innerRadius)
@@ -303,5 +300,5 @@ function gaugeCallback(text) {
     addGauge("#gauge2");
 }
 
-httpGetAsync("dbCon.php?data=last", gaugeCallback);
+httpGetAsync("dbCon.php?period=last", gaugeCallback);
 

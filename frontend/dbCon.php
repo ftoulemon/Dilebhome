@@ -17,13 +17,17 @@
         echo json_encode(mysql_fetch_assoc($query));
     }
     else {
-        if ($_GET['data'] == 'last') {
+        if ($_GET['period'] == 'last') {
             $myquery = "SELECT * FROM `records_minute` ORDER BY ts DESC LIMIT 1";
         }
-        else if ($_GET['period'] == 'todayMinute') {
-            $myquery = "SELECT * FROM `records_minute` WHERE DATE(`ts`) = CURDATE()";
+        else if ($_GET['period'] == 'minute') {
+            if (isSet($_GET['date'])) {
+                $myquery = "SELECT * FROM `records_minute` WHERE DATE(`ts`) = '" . $_GET['date'] . "'";
+            } else {
+                $myquery = "SELECT * FROM `records_minute` WHERE DATE(`ts`) = CURDATE()";
+            }
         }
-        else if ($_GET['period'] == 'todayHour') {
+        else if ($_GET['period'] == 'hour') {
             $myquery = "SELECT * FROM `records_hour` WHERE DATE(`ts`) = CURDATE()";
         }
         else if ($_GET['period'] == 'month') {
