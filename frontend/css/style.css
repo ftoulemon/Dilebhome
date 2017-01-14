@@ -1,3 +1,10 @@
+.picker__date-display {
+    background-color: #4fa0f7;
+}
+.picker__weekday-display {
+    background-color: steelblue;
+}
+
 path { 
     stroke: steelblue;
     stroke-width: 2;

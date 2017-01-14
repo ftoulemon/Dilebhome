@@ -1,7 +1,7 @@
 // Set the dimensions of the canvas / graph
-var margin = {top: 30, right: 10, bottom: 140, left: 50},
-    width = parseInt(d3.select('#graphMonth').style('width'), 10),
-    width = width - margin.left - margin.right,
+const margin = {top: 30, right: 10, bottom: 140, left: 50},
+    widthTmp = parseInt(d3.select('#graphMonth').style('width'), 10),
+    width = widthTmp - margin.left - margin.right,
     barHeight = 20,
     height = 400 - margin.top - margin.bottom,
     percent = d3.format('%');
@@ -47,6 +47,8 @@ function addGraph(position, php){
         .x(function(d) { return x(d.ts); })
         .y(function(d) { return y(d.hchpd); });
 
+    // Remove previous
+    d3.select(position).selectAll("*").remove();
     // Adds the svg canvas
     var svg = d3.select(position)
         .append("svg")
@@ -231,3 +233,12 @@ function addBarGraph(position, php){
 addGraph("#graphTodayMinutes", "dbCon.php?period=todayMinute");
 addBarGraph("#graphToday", "dbCon.php?period=todayHour");
 addBarGraph("#graphMonth", "dbCon.php?period=month");
+
+// Initialize date picker
+var datepicker = $('.datepicker').pickadate({
+    selectMonths: true, // Creates a dropdown to control month
+    selectYears: 10, // Creates a dropdown of 15 years to control year
+    onClose: function () {
+        addGraph("#graphTodayMinutes", "dbCon.php?period=todayMinute")
+    }
+});

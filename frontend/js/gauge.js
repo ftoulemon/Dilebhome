@@ -304,3 +304,4 @@ function gaugeCallback(text) {
 }
 
 httpGetAsync("dbCon.php?data=last", gaugeCallback);
+
