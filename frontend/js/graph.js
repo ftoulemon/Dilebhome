@@ -27,16 +27,25 @@ function addGraph(position, php){
         .tickSizeOuter(0)
         .tickPadding(10);
     // Area under the line
-    var area = d3.area()
+    var areaHC = d3.area()
         .curve(d3.curveCardinal)
         .x(function(d) { return x(d.ts); })
         .y0(height)
         .y1(function(d) { return y(d.hchcd); });
+    var areaHP = d3.area()
+        .curve(d3.curveCardinal)
+        .x(function(d) { return x(d.ts); })
+        .y0(height)
+        .y1(function(d) { return y(d.hchpd); });
     // Define the line
-    var valueline = d3.line()
+    var valuelineHC = d3.line()
         .curve(d3.curveCardinal)
         .x(function(d) { return x(d.ts); })
         .y(function(d) { return y(d.hchcd); });
+    var valuelineHP = d3.line()
+        .curve(d3.curveCardinal)
+        .x(function(d) { return x(d.ts); })
+        .y(function(d) { return y(d.hchpd); });
 
     // Adds the svg canvas
     var svg = d3.select(position)
@@ -51,18 +60,30 @@ function addGraph(position, php){
         data.forEach(function(d) {
             d.ts = parseDate(d.ts);
             d.hchcd = +d.hchcd;
+            d.hchpd = +d.hchpd;
         });
         // Scale the range of the data
         x.domain(d3.extent(data, function(d) { return d.ts; }));
-        y.domain([0, d3.max(data, function(d) { return d.hchcd; })]);
+        y.domain([0, d3.max(data, function(d) { return Math.max(d.hchcd, d.hchpd); })]);
         svg.append("path")
             .data([data])
             .attr("class", "area")
-            .attr("d", area);
+            .attr("d", areaHC);
+        svg.append("path")
+            .data([data])
+            .attr("class", "area")
+            .attr("d", areaHP);
         // Add the valueline path.
         var path = svg.append("path")
+            .data([data])
             .attr("class", "line")
-            .attr("d", valueline(data));
+            .style("stroke", "#81d4fa")
+            .attr("d", valuelineHC);
+        var path = svg.append("path")
+            .data([data])
+            .attr("class", "line")
+            .style("stroke", "#4fa0f7")
+            .attr("d", valuelineHP);
         var totalLength = path.node().getTotalLength();
         path
             .attr("stroke-dasharray", totalLength + " " + totalLength)
@@ -102,8 +123,8 @@ function addGraph(position, php){
             .attr("height", height)
             .on("mouseover", function() { focus.style("display", null); })
             .on("mouseout", function() { focus.style("display", "none"); })
-            .on("mousemove", mousemove);
-        function mousemove() {
+            .on("mousemove", mousemoveHC);
+        function mousemoveHC() {
             var x0 = x.invert(d3.mouse(this)[0]),
                 i = bisectDate(data, x0, 1),
                 d0 = data[i - 1],
