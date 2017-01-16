@@ -85,7 +85,7 @@ class Acquisition(object):
         END_OF_FRAME = chr(3)
         # open the port
         try:
-            with serial.Serial("/dev/ttyS0",
+            with serial.Serial("/dev/ttyAMA0",
                     baudrate=1200,
                     bytesize=serial.SEVENBITS,
                     stopbits=serial.STOPBITS_ONE,
