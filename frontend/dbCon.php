@@ -1,7 +1,7 @@
 <?php
-    $username = "root";
-    $password = "";
-    $host = "chip";
+    $username = "frontend";
+    $password = "frontendpwd";
+    $host = "ghetto";
     $database="Electricity";
 
     $server = mysql_connect($host, $username, $password);

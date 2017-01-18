@@ -42,7 +42,7 @@ def SetupCrontab():
     wCron.remove_all(command=wFile)
     # Create jobs
     wJobminute = wCron.new(command=wFile + ' -vvv -p minute', user='root')
-    wJobminute.setall('* * * * *')
+    wJobminute.setall('*/5 * * * *')
     wJobhour = wCron.new(command=wFile + ' -vvv -p hour', user='root')
     wJobhour.setall('59 * * * *')
     wJobday = wCron.new(command=wFile + ' -vvv -p day', user='root')
