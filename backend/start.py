@@ -7,6 +7,7 @@ import signal
 import logging
 import argparse
 import datetime
+import time
 
 from crontab import CronTab
 
@@ -91,7 +92,7 @@ if __name__ == "__main__":
                 wDb.Init()
     else:
         # data
-        wRetry = 3
+        wRetry = 10
         while wRetry > 0:
             wRetry -= 1
             wFrame = acq.GetData()
@@ -99,6 +100,8 @@ if __name__ == "__main__":
                 wRet = acq.ProcessFrame(dicTable[args.period], wFrame)
                 if wRet is True:
                     wRetry = 0
+                else:
+                    time.sleep(10)
         # system monitoring
         if args.period == 'minute':
             sm.Monitor()
