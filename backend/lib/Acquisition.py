@@ -20,12 +20,16 @@ class Acquisition(object):
         """
         aDb.UpdateInfo(aADCO, aOPTARIF, aISOUSC, aIMAX)
 
-    def __SaveRecord(self, aDb, aTable, aHCHC, aHCHP):
+    def __SaveRecord(self, aDb, aTable, aHCHC = None, aHCHP = None):
         """
         Save new record
         """
         # Get last data
         wLast = aDb.GetLastRecord(aTable)
+        if aHCHC is None:
+            aHCHC = wLast['hchc']
+        if aHCHP is None:
+            aHCHP = wLast['hchp']
         logging.debug("Last: {0}".format(wLast))
         if wLast:
             try:
@@ -69,7 +73,8 @@ class Acquisition(object):
             # save new record
             try:
                 self.__SaveRecord(wDb, aTable,
-                        wDic['HCHC'], wDic['HCHP'])
+                        wDic['HCHC'] if 'HCHC' in wDic else None,
+                        wDic['HCHP'] if 'HCHP' in wDic else None)
                 logging.info("Record saved to {0}".format(aTable))
                 wRet = True
             except Exception as e:
