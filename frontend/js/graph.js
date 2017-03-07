@@ -232,6 +232,7 @@ function addBarGraph(position, php){
 
 addGraph("#graphMinute", "dbCon.php?period=minute");
 addBarGraph("#graphHour", "dbCon.php?period=hour");
+addBarGraph("#graphDay", "dbCon.php?period=day");
 addBarGraph("#graphMonth", "dbCon.php?period=month");
 
 // Initialize date picker

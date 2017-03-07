@@ -30,8 +30,11 @@
         else if ($_GET['period'] == 'hour') {
             $myquery = "SELECT * FROM `records_hour` WHERE DATE(`ts`) = CURDATE()";
         }
+        else if ($_GET['period'] == 'day') {
+            $myquery = "SELECT * FROM `records_day` LIMIT 30";
+        }
         else if ($_GET['period'] == 'month') {
-            $myquery = "SELECT * FROM `records_day`";
+            $myquery = "SELECT * FROM `records_month`";
         }
         else {
             $myquery = '';
