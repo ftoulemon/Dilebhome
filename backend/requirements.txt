@@ -1,0 +1,3 @@
+pyserial
+MySQL-python
+python-crontab

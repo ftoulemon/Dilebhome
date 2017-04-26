@@ -20,12 +20,16 @@ class Acquisition(object):
         """
         aDb.UpdateInfo(aADCO, aOPTARIF, aISOUSC, aIMAX)
 
-    def __SaveRecord(self, aDb, aTable, aHCHC, aHCHP):
+    def __SaveRecord(self, aDb, aTable, aHCHC = None, aHCHP = None):
         """
         Save new record
         """
         # Get last data
         wLast = aDb.GetLastRecord(aTable)
+        if aHCHC is None:
+            aHCHC = wLast['hchc']
+        if aHCHP is None:
+            aHCHP = wLast['hchp']
         logging.debug("Last: {0}".format(wLast))
         if wLast:
             try:
@@ -69,7 +73,8 @@ class Acquisition(object):
             # save new record
             try:
                 self.__SaveRecord(wDb, aTable,
-                        wDic['HCHC'], wDic['HCHP'])
+                        wDic['HCHC'] if 'HCHC' in wDic else None,
+                        wDic['HCHP'] if 'HCHP' in wDic else None)
                 logging.info("Record saved to {0}".format(aTable))
                 wRet = True
             except Exception as e:
@@ -95,25 +100,25 @@ class Acquisition(object):
                 wFrame = ''
                 wNbRead = 0
                 wTimeout = 0
-                # Seek start of frame
-                while wByte != START_OF_FRAME and wNbRead < 100 and wTimeout < 3:
-                    wNbRead += 1
-                    wByte = wPort.read()
-                    if wByte is None or wByte == '':
-                        wTimeout += 1
-                # Main loop
                 wNbRead = 0
+                wStartDetected = False
                 self._StopRequested = False
+                # Main loop
                 while self._StopRequested is False and wNbRead < 500 and wTimeout < 3:
                     wNbRead += 1
                     try:
                         wByte = wPort.read()
+                        # Seek start of frame
                         if wByte == START_OF_FRAME:
                             wFrame = ''
+                            wStartDetected = True
+                        # Until the end
                         elif wByte == END_OF_FRAME:
-                            self._StopRequested = True
+                            if wStartDetected is True:
+                                self._StopRequested = True
                         else:
-                            wFrame += wByte
+                            if wStartDetected is True:
+                                wFrame += wByte
                     except Exception as e:
                         logging.error("Read error: {0}".format(e))
                         wFrame = ''
