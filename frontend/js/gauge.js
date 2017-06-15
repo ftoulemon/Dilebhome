@@ -1,8 +1,8 @@
 const  widthGauge = 300;
 const innerRadius = Math.round((widthGauge * 130) / 300);
 const outterRadius = Math.round((widthGauge * 145) / 300);
-const majorGraduations = 5;
-const minorGraduations = 10;
+const majorGraduations = 6;
+const minorGraduations = 5;
 const majorGraduationLenght = Math.round((widthGauge * 16) / 300);
 const minorGraduationLenght = Math.round((widthGauge * 10) / 300);
 const majorGraduationMarginTop = Math.round((widthGauge * 7) / 300);
@@ -25,9 +25,8 @@ var scope = {
     valueUnit: "W",
     precision: 0,
     ranges: [
-        { min: 0, max: 100, color: '#DEDEDE' },
-        { min: 100, max: 150, color: '#8DCA2F' },
-        { min: 150, max: 200, color: '#FDC702' },
+        { min: 0, max: 100, color: '#8DCA2F' },
+        { min: 100, max: 200, color: '#FDC702' },
         { min: 200, max: 250, color: '#FF7700' },
         { min: 250, max: 300, color: '#C50200' } ]
 };
@@ -283,11 +282,11 @@ function render() {
 function httpGetAsync(theUrl, callback)
 {
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function() { 
+    xmlHttp.onreadystatechange = function() {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
             callback(xmlHttp.responseText);
     }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous
     xmlHttp.send(null);
 }
 
