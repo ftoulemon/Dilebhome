@@ -38,10 +38,15 @@
         <!-- ROW 1 -->
         <div class="row">
             <div class="col s12 m4" id="system" v-cloak>
-                <system-template :diskusage="du"></system-template>
+                <system-template :loading="loading"
+                    :diskusage="du"></system-template>
             </div>
             <div class="col s12 m4" id="info" v-cloak>
-                <info-template :adco="adco" :optarif="optarif" :isousc="isousc" :imax="imax"></info-template>
+                <info-template :loading="loading"
+                    :adco="adco"
+                    :optarif="optarif"
+                    :isousc="isousc"
+                    :imax="imax"></info-template>
             </div>
             <div class="col s12 m4" id="ptec" v-cloak>
                 <ptec-template :checked="hp"></ptec-template>

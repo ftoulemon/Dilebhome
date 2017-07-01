@@ -16,14 +16,33 @@ function httpGetAsync(theUrl, callback)
     xmlHttp.send(null);
 }
 
+Vue.component('loader', {
+    template: `
+          <div class="preloader-wrapper active">
+            <div class="spinner-layer spinner-blue-only">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div><div class="gap-patch">
+                <div class="circle"></div>
+              </div><div class="circle-clipper right">
+                <div class="circle"></div>
+              </div>
+            </div>
+          </div>
+        `
+})
+
 var systemVue = new Vue ({
     el: '#system',
     data: {
+        loading: false,
         du: "0"
     },
     created: function() {
+        this.loading = true;
         var me = this;
         httpGetAsync("dbCon.php?data=system", function (text) {
+                me.loading = false;
                 data = JSON.parse(text);
                 me.du = data.du;
             }
@@ -31,12 +50,15 @@ var systemVue = new Vue ({
     },
     components: {
         'system-template': {
-            props: ["diskusage"],
+            props: ["loading", "diskusage"],
             template: `
                 <div class="card z-depth-3 blue-grey darken-2">
                     <div class="card-content white-text">
                         <span class="card-title">System</span>
-                        <table class="bordered">
+                        <div class="center" v-if="loading">
+                            <loader></loader>
+                        </div>
+                        <table class="bordered" v-if="!loading">
                             <tbody>
                                 <tr>
                                     <td>Disk usage</td>
@@ -63,12 +85,15 @@ var infoVue = new Vue({
         adco: "",
         optarif: "",
         isousc: "",
-        imax: ""
+        imax: "",
+        loading: false
     },
     created: function() {
         var me = this;
+        me.loading = true;
         httpGetAsync("dbCon.php?data=info", function (text) {
                 data = JSON.parse(text);
+                me.loading = false;
                 me.adco = data.adco;
                 me.optarif = data.optarif;
                 me.isousc = data.isousc;
@@ -78,12 +103,15 @@ var infoVue = new Vue({
     },
     components: {
         'info-template': {
-            props: ['adco', 'optarif', 'isousc', 'imax'],
+            props: ['loading', 'adco', 'optarif', 'isousc', 'imax'],
             template: `
                 <div class="card z-depth-3 blue-grey darken-2">
                     <div class="card-content white-text">
                         <span class="card-title">Info</span>
-                        <table class="bordered">
+                        <div class="center" v-if="loading">
+                            <loader></loader>
+                        </div>
+                        <table class="bordered" v-if="!loading">
                             <tbody>
                                 <tr><td>ID</td> <td>{{ adco }}</td></tr>
                                 <tr><td>Option tarif</td> <td>{{ optarif }}</td></tr>
