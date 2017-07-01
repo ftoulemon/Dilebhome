@@ -1,21 +1,3 @@
-function httpGet(theUrl) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
-    xmlHttp.send( null );
-    return xmlHttp.responseText;
-}
-
-function httpGetAsync(theUrl, callback)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function() {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
-    }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous
-    xmlHttp.send(null);
-}
-
 Vue.component('loader', {
     template: `
           <div class="preloader-wrapper active">
@@ -39,11 +21,11 @@ var systemVue = new Vue ({
         du: "0"
     },
     created: function() {
-        this.loading = true;
         var me = this;
-        httpGetAsync("dbCon.php?data=system", function (text) {
+        me.loading = true;
+        me.$http.get("dbCon.php?data=system").then(response => {
                 me.loading = false;
-                data = JSON.parse(text);
+                data = response.body
                 me.du = data.du;
             }
         );
@@ -91,15 +73,14 @@ var infoVue = new Vue({
     created: function() {
         var me = this;
         me.loading = true;
-        httpGetAsync("dbCon.php?data=info", function (text) {
-                data = JSON.parse(text);
-                me.loading = false;
-                me.adco = data.adco;
-                me.optarif = data.optarif;
-                me.isousc = data.isousc;
-                me.imax = data.imax;
-            }
-        );
+        me.$http.get("dbCon.php?data=info").then(response => {
+            data = response.body;
+            me.loading = false;
+            me.adco = data.adco;
+            me.optarif = data.optarif;
+            me.isousc = data.isousc;
+            me.imax = data.imax;
+        });
     },
     components: {
         'info-template': {
