@@ -12,7 +12,7 @@ var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S"),
     formatValue = function(d) { return d + "Wh"; };
 
 // Function to add a linear graph
-function addGraph(position, php){
+function addGraph(vue, position, php){
     // Set the ranges
     var x = d3.scaleTime().range([0, width]);
     var y = d3.scaleLinear().range([height, 0]);
@@ -57,8 +57,10 @@ function addGraph(position, php){
         .append("g")
             .attr("transform",
                   "translate(" + margin.left + "," + margin.top + ")");
+    vue.loading = true;
     // Get the data
     d3.json(php, function(error, data) {
+        vue.loading = false;
         data.forEach(function(d) {
             d.ts = parseDate(d.ts);
             d.hchcd = +d.hchcd;
@@ -230,10 +232,29 @@ function addBarGraph(position, php){
     });
 }
 
-addGraph("#graphMinute", "dbCon.php?period=minute");
 addBarGraph("#graphHour", "dbCon.php?period=hour");
 addBarGraph("#graphDay", "dbCon.php?period=day");
 addBarGraph("#graphMonth", "dbCon.php?period=month");
+
+var loadMinuteVue = new Vue({
+    el: "#loadminute",
+    data: {
+        loading: false
+    },
+    created: function() {
+        var me = this;
+        addGraph(this, '#graphMinute', "dbCon.php?period=minute");
+    },
+    components: {
+        'load-template': {
+            props: ['loading'],
+            template: `
+                <div class="center" v-if="loading">
+                    <loader></loader>
+                </div> `
+        }
+    }
+});
 
 // Initialize date picker
 var datepicker = $('.datepicker').pickadate({
@@ -241,7 +262,7 @@ var datepicker = $('.datepicker').pickadate({
     selectYears: 10, // Creates a dropdown of 15 years to control year
     format: 'yyyy-mm-dd',
     onClose: function () {
-        addGraph("#graphMinute", "dbCon.php?period=minute&date="+datepicker[0].value);
+        addGraph(loadMinuteVue, "#graphMinute", "dbCon.php?period=minute&date="+datepicker[0].value);
         $(document.activeElement).blur();
     }
 });
