@@ -1,4 +1,4 @@
-const  widthGauge = 300;
+const widthGauge = 300;
 const innerRadius = Math.round((widthGauge * 130) / 300);
 const outterRadius = Math.round((widthGauge * 145) / 300);
 const majorGraduations = 6;
@@ -279,25 +279,40 @@ function render() {
     renderGraduationNeedle(minLimit, maxLimit);
 }
 
-function httpGetAsync(theUrl, callback)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function() {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
+var gaugeVue = new Vue({
+    el: "#gauges",
+    data: {
+        elemidhc: 'svggaugehc',
+        elemidhp: 'svggaugehp',
+        loading: false
+    },
+    created: function() {
+        var me = this;
+        me.loading = true;
+        me.$http.get("dbCon.php?period=last").then(response => {
+            var data = response.body;
+            me.loading = false;
+            scope.value = parseInt(data[0].hchcd);
+            addGauge('#'+me.elemidhc);
+            scope.value = parseInt(data[0].hchpd);
+            addGauge('#'+me.elemidhp);
+        });
+    },
+    components: {
+        'gauge-template': {
+            props: ['loading', 'title', 'elemid'],
+            template: `
+                <div class="card z-depth-3 blue-grey darken-2">
+                    <div class="card-content white-text">
+                        <span class="card-title">{{ title }}</span>
+                        <div class="center" v-if="loading">
+                            <loader></loader>
+                        </div>
+                        <div class="gauge-board">
+                            <span :id="elemid"></span>
+                        </div>
+                    </div>
+                </div> `
+        }
     }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous
-    xmlHttp.send(null);
-}
-
-function gaugeCallback(text) {
-    data = JSON.parse(text);
-    scope.value = parseInt(data[0].hchcd);
-    addGauge("#gauge1");
-
-    scope.value = parseInt(data[0].hchpd);
-    addGauge("#gauge2");
-}
-
-httpGetAsync("dbCon.php?period=last", gaugeCallback);
-
+});
